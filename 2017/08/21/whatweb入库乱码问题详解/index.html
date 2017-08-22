@@ -78,12 +78,10 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="python," />
 
 
 
-
-  
 
 
   <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml" />
@@ -98,17 +96,28 @@
 
 
 
-<meta name="description" content="我，是个斗士。">
+<meta name="description" content="本文讲解笔者在使用whatweb对域名库中的域名进行指纹爬取并入库mongodb时遇到的一些坑以及解决方案。 详情问题通过whatweb扫描出来的数据，插入到数据库中后，发现很多不同的编码和乱码，包括url编码、unicode编码、乱码等等，如下 解决方案当我直接在命令行执行几个数据库中Title字段乱码或者编码有问题的Domain时，命令行直接输出的Title是正常的中文汉字所以判断是代码的问题">
+<meta name="keywords" content="python">
 <meta property="og:type" content="article">
-<meta property="og:title" content="test_my_site">
-<meta property="og:url" content="http://yoursite.com/2017/08/21/test-my-site/index.html">
+<meta property="og:title" content="whatweb入库乱码问题详解">
+<meta property="og:url" content="http://yoursite.com/2017/08/21/whatweb入库乱码问题详解/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="我，是个斗士。">
+<meta property="og:description" content="本文讲解笔者在使用whatweb对域名库中的域名进行指纹爬取并入库mongodb时遇到的一些坑以及解决方案。 详情问题通过whatweb扫描出来的数据，插入到数据库中后，发现很多不同的编码和乱码，包括url编码、unicode编码、乱码等等，如下 解决方案当我直接在命令行执行几个数据库中Title字段乱码或者编码有问题的Domain时，命令行直接输出的Title是正常的中文汉字所以判断是代码的问题">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-08-21T06:37:13.576Z">
+<meta property="og:image" content="http://i.imgur.com/U3VSDzA.jpg">
+<meta property="og:image" content="http://i.imgur.com/exLX3nS.jpg">
+<meta property="og:image" content="http://i.imgur.com/c7Zwvb8.png">
+<meta property="og:image" content="http://i.imgur.com/47SAyJB.png">
+<meta property="og:image" content="http://i.imgur.com/qOemh19.png">
+<meta property="og:image" content="http://i.imgur.com/2y69CFG.png">
+<meta property="og:image" content="http://i.imgur.com/emPA8cm.png">
+<meta property="og:image" content="http://i.imgur.com/kih39mN.png">
+<meta property="og:image" content="http://i.imgur.com/iJJO6Pi.png">
+<meta property="og:updated_time" content="2017-08-22T03:00:17.537Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="test_my_site">
-<meta name="twitter:description" content="我，是个斗士。">
+<meta name="twitter:title" content="whatweb入库乱码问题详解">
+<meta name="twitter:description" content="本文讲解笔者在使用whatweb对域名库中的域名进行指纹爬取并入库mongodb时遇到的一些坑以及解决方案。 详情问题通过whatweb扫描出来的数据，插入到数据库中后，发现很多不同的编码和乱码，包括url编码、unicode编码、乱码等等，如下 解决方案当我直接在命令行执行几个数据库中Title字段乱码或者编码有问题的Domain时，命令行直接输出的Title是正常的中文汉字所以判断是代码的问题">
+<meta name="twitter:image" content="http://i.imgur.com/U3VSDzA.jpg">
 
 
 
@@ -138,13 +147,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/08/21/test-my-site/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/08/21/whatweb入库乱码问题详解/"/>
 
 
 
 
 
-  <title>test_my_site | Hexo</title>
+  <title>whatweb入库乱码问题详解 | Hexo</title>
   
 
 
@@ -281,7 +290,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/21/test-my-site/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/21/whatweb入库乱码问题详解/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Bipabo1l">
@@ -298,7 +307,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">test_my_site</h1>
+          <h1 class="post-title" itemprop="name headline">whatweb入库乱码问题详解</h1>
         
 
         <div class="post-meta">
@@ -310,7 +319,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-21T14:37:13+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-21T16:24:23+08:00">
                 2017-08-21
               </time>
             
@@ -348,7 +357,16 @@
       
 
       
-        
+        <p>本文讲解笔者在使用whatweb对域名库中的域名进行指纹爬取并入库mongodb时遇到的一些坑以及解决方案。</p>
+<h2 id="详情"><a href="#详情" class="headerlink" title="详情"></a>详情</h2><h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>通过whatweb扫描出来的数据，插入到数据库中后，发现很多不同的编码和乱码，包括url编码、unicode编码、乱码等等，如下<br><img src="http://i.imgur.com/U3VSDzA.jpg" alt=""></p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>当我直接在命令行执行几个数据库中Title字段乱码或者编码有问题的Domain时，命令行直接输出的Title是正常的中文汉字<br><img src="http://i.imgur.com/exLX3nS.jpg" alt=""><br>所以判断是代码的问题，进入到代码中，发现原来的代码whatweb扫描出来之后，未特殊判断可能带有汉字的Title，于是加上了一个单独的Title判断，如果是Title，那么Append到list之前经过一个函数处理，<br>函数判断是否为unicode（基本全部是unicode），如果是先url解码（因为当前的数据类型是）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">u&apos;JIMI%E6%99%BA%E8%83%BD%E6%9C%BA%E5%99%A8%E4%BA%BA - %E4%BA%AC%E4%B8%9C&apos;</div></pre></td></tr></table></figure></p>
+<p>想到把<br><img src="http://i.imgur.com/c7Zwvb8.png" alt=""><br>这段代码直接unicode转汉字应该就能解决问题了，于是加上</p>
+<pre><code>.decode(&apos;unicode-escape&apos;)
+</code></pre><p>发现直接输出为乱码，return后输出的并未unicode解密，反而二次unicode加密</p>
+<p>于是思考从url解码之前就处理问题，而不是经过解码之后变成unicode再处理。发现在main函数中，最后输出时还有json.dumps处理，那么直接打印处理前的数据，看中文是如何显示的<br><img src="http://i.imgur.com/47SAyJB.png" alt=""><br>发现是控制台信息输出窗口按照ascii编码输出utf8编码的字符串的结果，这时候基本可以定位问题了，是在转换到json格式时出现的问题，json.dumps函数中加一个ensure_ascii参数，值设置为False即可。测试一下：<br><img src="http://i.imgur.com/qOemh19.png" alt=""><br>显示成功！</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>所以最后的解决方案为：<br>1.jdradar\core\fingerprint路径下的WhatWeb.py，parse_plugin函数中判断一下name是否为Title，如果是，将plugin.get(‘string’)处理成字符串模式后，plugins.append({name: deal_word_method(string)})plugins列表添加时string用deal_word_method函数处理，函数判断传入的word是否为unicode，是的话url解码。<br>然后返回<br><img src="http://i.imgur.com/2y69CFG.png" alt=""><br>2.在jdradar\tasks.py的fingerprint_scan函数中，加入json.dumps处理，ensure_ascii设置为False</p>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>测试是否有效：<br>选取一个原来差入后Title乱码的document，domain为<a href="http://jimi-api.jd.com:80" target="_blank" rel="external">http://jimi-api.jd.com:80</a><br><img src="http://i.imgur.com/emPA8cm.png" alt=""><br>利用如下代码，进行插入<br><img src="http://i.imgur.com/kih39mN.png" alt=""><br>插入成功后，查看DocumentTitle字段是否乱码<br><img src="http://i.imgur.com/iJJO6Pi.png" alt=""><br>执行成功，未乱码</p>
+
       
     </div>
     
@@ -363,6 +381,12 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/python/" rel="tag"># python</a>
+          
+        </div>
+      
 
       
       
@@ -372,8 +396,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/08/21/hello-world/" rel="next" title="Hello World">
-                <i class="fa fa-chevron-left"></i> Hello World
+              <a href="/2017/08/21/test-my-site/" rel="next" title="test_my_site">
+                <i class="fa fa-chevron-left"></i> test_my_site
               </a>
             
           </div>
@@ -381,10 +405,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/08/21/whatweb入库乱码问题详解/" rel="prev" title="whatweb入库乱码问题详解">
-                whatweb入库乱码问题详解 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -436,8 +456,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://img11.360buyimg.com/ee/jfs/t6790/284/2278650655/136645/39cd6a81/598b0aa7N1f2bda3c.jpg"
@@ -497,6 +526,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#详情"><span class="nav-number">1.</span> <span class="nav-text">详情</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题"><span class="nav-number">1.1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方案"><span class="nav-number">1.2.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">1.3.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试"><span class="nav-number">1.4.</span> <span class="nav-text">测试</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
