@@ -46,20 +46,6 @@
   </entry>
   
   <entry>
-    <title>test_my_site</title>
-    <link href="http://yoursite.com/2017/08/21/test-my-site/"/>
-    <id>http://yoursite.com/2017/08/21/test-my-site/</id>
-    <published>2017-08-21T06:37:13.000Z</published>
-    <updated>2017-08-21T06:37:13.576Z</updated>
-    
-    <summary type="html">
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
     <title>Hello World</title>
     <link href="http://yoursite.com/2017/08/21/hello-world/"/>
     <id>http://yoursite.com/2017/08/21/hello-world/</id>
