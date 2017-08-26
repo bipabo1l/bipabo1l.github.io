@@ -78,12 +78,10 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="golang python" />
+  <meta name="keywords" content="python,MS17-010,wannaCry," />
 
 
 
-
-  
 
 
   <link rel="alternate" href="/atom.xml" title="Bipabo1l's Blog" type="application/atom+xml" />
@@ -98,17 +96,18 @@
 
 
 
-<meta name="description" content="我是 程序员 \ 安全研究员  擅长 python \ flask \ golang \ beego \ mongodb \ 渗透测试 职责 安全研发、安全研究 15年毕业于dlut，现蜗居帝都，就职JD.COM。 这个blog主要分享一些自认为非常有用的技术笔记及记录与分享自己的技术成长。 我，在路上，等你。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="关于我">
-<meta property="og:url" content="http://yoursite.com/about/index.html">
+<meta name="description" content="本文讲解如何通过脚本批量扫描内网中服务器是否开放445端口以及存在ms 17-010漏洞">
+<meta name="keywords" content="python,MS17-010,wannaCry">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python 基于nmap多线程扫描ms17-010脚本">
+<meta property="og:url" content="http://yoursite.com/2017/08/26/python-基于nmap多线程扫描ms17-010脚本/index.html">
 <meta property="og:site_name" content="Bipabo1l&#39;s Blog">
-<meta property="og:description" content="我是 程序员 \ 安全研究员  擅长 python \ flask \ golang \ beego \ mongodb \ 渗透测试 职责 安全研发、安全研究 15年毕业于dlut，现蜗居帝都，就职JD.COM。 这个blog主要分享一些自认为非常有用的技术笔记及记录与分享自己的技术成长。 我，在路上，等你。">
+<meta property="og:description" content="本文讲解如何通过脚本批量扫描内网中服务器是否开放445端口以及存在ms 17-010漏洞">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2017-08-24T09:22:48.660Z">
+<meta property="og:updated_time" content="2017-08-26T12:11:39.928Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="关于我">
-<meta name="twitter:description" content="我是 程序员 \ 安全研究员  擅长 python \ flask \ golang \ beego \ mongodb \ 渗透测试 职责 安全研发、安全研究 15年毕业于dlut，现蜗居帝都，就职JD.COM。 这个blog主要分享一些自认为非常有用的技术笔记及记录与分享自己的技术成长。 我，在路上，等你。">
+<meta name="twitter:title" content="python 基于nmap多线程扫描ms17-010脚本">
+<meta name="twitter:description" content="本文讲解如何通过脚本批量扫描内网中服务器是否开放445端口以及存在ms 17-010漏洞">
 
 
 
@@ -138,13 +137,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/about/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/08/26/python-基于nmap多线程扫描ms17-010脚本/"/>
 
 
 
 
 
-  <title>关于我 | Bipabo1l's Blog</title>
+  <title>python 基于nmap多线程扫描ms17-010脚本 | Bipabo1l's Blog</title>
   
 
 
@@ -279,39 +278,273 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/26/python-基于nmap多线程扫描ms17-010脚本/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Bipabo1l">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://img11.360buyimg.com/ee/jfs/t6790/284/2278650655/136645/39cd6a81/598b0aa7N1f2bda3c.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Bipabo1l's Blog">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline">关于我</h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <p><strong>我是</strong> 程序员 \ 安全研究员 </p>
-<p><strong>擅长</strong> python \ flask \ golang \ beego \ mongodb \ 渗透测试</p>
-<p><strong>职责</strong> 安全研发、安全研究</p>
-<p>15年毕业于dlut，现蜗居帝都，就职JD.COM。</p>
-<p>这个blog主要分享一些自认为非常有用的技术笔记及记录与分享自己的技术成长。</p>
-<p>我，在路上，等你。</p>
-
+          <h1 class="post-title" itemprop="name headline">python 基于nmap多线程扫描ms17-010脚本</h1>
         
-      </div>
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-26T19:31:03+08:00">
+                2017-08-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">in</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/安全研发/" itemprop="url" rel="index">
+                    <span itemprop="name">安全研发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  本文讲解如何通过脚本批量扫描内网中服务器是否开放445端口以及存在ms 17-010漏洞
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
       
+
+      
+        <h2 id="详情"><a href="#详情" class="headerlink" title="详情"></a>详情</h2><p>nmap 7.50及以后的版本支持对MS17-010漏洞，即永恒之蓝漏洞的扫描，以下为针对甲方公司的安全人员，针对公司内网网段进行批量的多线程漏洞扫描。</p>
+<p>脚本的原理为首先生成一个带扫描的ip文件，然后调用nmap命令nmap -iL ip_test.txt -p 445 –open -T4 -oX ./result/filename.txt来扫描开放了445端口的ip，并生成列表，随后读取445端口开放的ip并放入队列中，然后多线程处理队列中的ip并利用nmap命令nmap -p 445 –script smb-vuln-ms17-010.nse IP来检测存在漏洞的ip数量。</p>
+<pre><code>#!/usr//bin/python
+# -*- coding: utf-8 -*-
+# author: bipabo1l@csoio.com
+
+import os
+import requests
+import time
+import re
+import commands
+
+list_vul_ip = []
+
+class WyWorker(threading.Thread):
+    def __init__(self, queue):
+        threading.Thread.__init__(self)
+        self.queue = queue
+
+    def run(self):
+        while True:
+            if self.queue.empty():
+                break
+            try:
+                ip = self.queue.get_nowait()
+                if ip:
+                    (status, output) = commands.getstatusoutput(&apos;nmap -p 445 --script smb-vuln-ms17-010.nse &apos; + ip)
+                    print output
+                    if &apos;CVE&apos; in output:
+                        list_vul_ip.append(ip)
+            except Exception, e:
+                break
+        print &quot;scan success&quot;
+def main():
+    try:
+        threads_count = 10
+        queue = Queue.Queue()
+        print &quot;begin:&quot;
+        files = &apos;445_open:&apos; + str(int(time.time()))
+        print &quot;scaning:&quot;
+        os.system(&apos;nmap -iL ip_test.txt -p 445 --open -T4 -oX ./result/%s.txt&apos; % files)
+        print &quot;scansuccess&quot;
+        file_name = files + &apos;.txt&apos;
+        file = open(&apos;/root/619/445/result/%s&apos; % file_name)
+        f_result = file.read()
+        regex = &apos;addr(.*)addrtype&apos;
+        list_ip = []
+        for m in re.findall(regex, f_result):
+            list_ip.append(m[10:-2])
+        print &quot;445 port open mechines:&quot; 
+        print list_ip
+        for ip in list_ip:
+            queue.put(ip)
+        print queue.qsize()
+        # 初始化线程组
+        threads = []
+        for i in xrange(threads_count):
+            threads.append(WyWorker(queue))
+
+        # 启动线程
+        for t in threads:
+            t.start()
+
+        # 等待线程执行结束后，回到主线程中
+        for t in threads:
+            t.join()
+        print list_vul_ip
+
+    except:
+        pass
+
+
+if __name__ == &apos;__main__&apos;:
+    main()
+</code></pre>
       
     </div>
     
     
     
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/python/" rel="tag"># python</a>
+          
+            <a href="/tags/MS17-010/" rel="tag"># MS17-010</a>
+          
+            <a href="/tags/wannaCry/" rel="tag"># wannaCry</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/21/whatweb入库乱码问题详解/" rel="next" title="whatweb入库乱码问题详解">
+                <i class="fa fa-chevron-left"></i> whatweb入库乱码问题详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微薄</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
   </div>
 
 
@@ -346,8 +579,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://img11.360buyimg.com/ee/jfs/t6790/284/2278650655/136645/39cd6a81/598b0aa7N1f2bda3c.jpg"
@@ -487,6 +729,22 @@
       </section>
 
       
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#详情"><span class="nav-number">1.</span> <span class="nav-text">详情</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
 
       
 
@@ -602,10 +860,10 @@
   
 
   
-    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
 <script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
 
-  
+
 
   
 
