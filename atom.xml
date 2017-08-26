@@ -120,7 +120,7 @@ if __name__ == &apos;__main__&apos;:
     <link href="http://yoursite.com/2017/08/21/whatweb%E5%85%A5%E5%BA%93%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98%E8%AF%A6%E8%A7%A3/"/>
     <id>http://yoursite.com/2017/08/21/whatweb入库乱码问题详解/</id>
     <published>2017-08-21T08:24:23.000Z</published>
-    <updated>2017-08-22T03:00:17.537Z</updated>
+    <updated>2017-08-26T12:18:46.010Z</updated>
     
     <content type="html"><![CDATA[<p>本文讲解笔者在使用whatweb对域名库中的域名进行指纹爬取并入库mongodb时遇到的一些坑以及解决方案。</p>
 <h2 id="详情"><a href="#详情" class="headerlink" title="详情"></a>详情</h2><h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>通过whatweb扫描出来的数据，插入到数据库中后，发现很多不同的编码和乱码，包括url编码、unicode编码、乱码等等，如下<br><img src="http://i.imgur.com/U3VSDzA.jpg" alt=""></p>
@@ -139,6 +139,8 @@ if __name__ == &apos;__main__&apos;:
 &lt;h2 id=&quot;详情&quot;&gt;&lt;a href=&quot;#详情&quot; class=&quot;headerlink&quot; title=&quot;详情&quot;&gt;&lt;/a&gt;详情&lt;/h2&gt;&lt;h3 id=&quot;问题&quot;
     
     </summary>
+    
+      <category term="安全研发" scheme="http://yoursite.com/categories/%E5%AE%89%E5%85%A8%E7%A0%94%E5%8F%91/"/>
     
     
       <category term="python" scheme="http://yoursite.com/tags/python/"/>
