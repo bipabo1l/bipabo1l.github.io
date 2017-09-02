@@ -385,69 +385,210 @@
           
             <h2 id="主题"><a href="#主题" class="headerlink" title="主题"></a>主题</h2><p>在网络安全圈，攻防是核心，在攻防中漏洞的重要性不言而喻，而CVE全称Common Vulnerabilities and Exposures，是全世界通用漏洞的集合，对于安全人员来说及时知晓刚爆出的通用型漏洞对于企业来讲是十分必要的。本文讲解上周本人使用Golang、Vuejs、Mongodb、Beego等技术实现的CVE监控的一点技术探讨。</p>
 <h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>具体需求为，实时爬取与【公司内部使用的开源框架/组件】相关的业内最新的CVE漏洞，进行网页展示以及邮件报警。</p>
-<h2 id="数据库设计"><a href="#数据库设计" class="headerlink" title="数据库设计"></a>数据库设计</h2><p>由于Mongodb的灵活性与类Json形式的语法，选择其作为我们的数据库。根据需求我们需要两个表，一个表存储CVE关键字和其重要程度；领一个表存储具体爬下来的每一个条CVE详情。<br>关键字表数据格式如下（以两条信息为例）：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;_id&quot; : ObjectId(&quot;599d2c1ca9218e4e8ec4e6xx&quot;),</div><div class="line">    &quot;keyword&quot; : [ </div><div class="line">        &#123;</div><div class="line">            &quot;wordname&quot; : &quot;spring&quot;,</div><div class="line">            &quot;wordcount&quot; : 1</div><div class="line">        &#125;, </div><div class="line">        &#123;</div><div class="line">            &quot;wordname&quot; : &quot;java&quot;,</div><div class="line">            &quot;wordcount&quot; : 2</div><div class="line">        &#125;</div><div class="line">&#125;</div><div class="line">``` </div><div class="line">其中wordcount为1表示高危，wordcount为2表示中危。</div><div class="line">CVE详情表数据格式如下(以一条信息为例)：</div><div class="line">``` </div><div class="line">&#123;</div><div class="line">    &quot;_id&quot; : ObjectId(&quot;59a69bf70988ac81605b76xx&quot;),</div><div class="line">    &quot;cve&quot; : &quot;CVE-2017-13758&quot;,</div><div class="line">    &quot;keyword&quot; : &quot;ImageMagick&quot;,</div><div class="line">    &quot;note&quot; : &quot;In ImageMagick 7.0.6-10, there is a heap-based buffer overflow in theTracePoint() function in MagickCore/draw.c.&quot;,</div><div class="line">    &quot;time&quot; : &quot;2017-08-30 19:05:28&quot;,</div><div class="line">    &quot;references&quot; : &quot;CONFIRM:https://www.imagemagick.org/discourse-server/viewtopic.php?f=3&amp;amp;t=32583&quot;,</div><div class="line">    &quot;isignored&quot; : true</div><div class="line">&#125;</div><div class="line">``` </div><div class="line">需要注意的是isignored字段表示是否需要忽略，在安全人员查看信息时，如果认为当前条目CVE不存在严重影响，甚至可以忽略时可以置其为忽略，而本字段记录其状态。</div><div class="line"></div><div class="line">## 爬虫的研发</div><div class="line"></div><div class="line">我们首先需要找到需要爬取的信息源，一方面需要一个接口能告知我们每日的更新，另一方面我们需要每个CVE编号对应的漏洞详情。通过CVE官网http://cve.mitre.org/，我们很快找到了两个需要的接口：</div><div class="line">``` </div><div class="line">https://cassandra.cerias.purdue.edu/CVE_changes/today.html</div><div class="line">``` </div><div class="line">以及</div><div class="line">``` </div><div class="line">http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-xxxx-xxxx</div><div class="line">``` </div><div class="line">整体逻辑为向接口1发送请求，正则匹配出我们需要的【New entries】信息，如下图所示</div><div class="line">![](http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-02_23-17-20.png)</div><div class="line">然后分别爬取每个cve对应的接口2的url，继续正则匹配出我们想要的漏洞详情信息、相关文档信息等，我们需要的信息如下。</div><div class="line">![](http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-02_23-29-52.png)</div><div class="line">随后查keyword库判断是否为我们想要的漏洞，这里比较的是keyword与Description信息，如果是则存到库中。</div><div class="line">回看整个过程，略微存在技术难点的地方在于正则表达式的编写与golang操作数据库得mgo库的利用。</div><div class="line">发送请求利用的是grequest库，爬取每日CVE更新信息代码如下：</div><div class="line">``` </div><div class="line">func monitorCVEimpl() ([]string) &#123;</div><div class="line">	op := grequests.RequestOptions&#123;</div><div class="line">		RequestTimeout:     10 * time.Second,</div><div class="line">		InsecureSkipVerify: true,</div><div class="line">		RedirectLimit:      5,</div><div class="line">	&#125;</div><div class="line">	urlStr := &quot;https://cassandra.cerias.purdue.edu/CVE_changes/today.html&quot;</div><div class="line">	res, _ := grequests.Get(urlStr, &amp;op)</div><div class="line">	newEntriesStr := Between(res.String(), &quot;New entries:&lt;br /&gt;&quot;, &quot;Graduations (CAN to CVE)&quot;)</div><div class="line">	digitsRegexp := regexp.MustCompile(&quot;&lt;A HREF = &apos;(.*?)&apos;&gt;(.*?)&lt;/A&gt;&quot;)</div><div class="line">	data := digitsRegexp.FindAllStringSubmatch(newEntriesStr, -1)</div><div class="line">	cveStrList := []string&#123;&#125;</div><div class="line">	for _, v := range data &#123;</div><div class="line">		//fmt.Println(v[2])</div><div class="line">		if v[2] != &quot;&quot; &#123;</div><div class="line">			cveStrList = append(cveStrList, v[2])</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	return cveStrList</div><div class="line">&#125;</div><div class="line">``` </div><div class="line">其中Between函数为一个工具函数，获取一个字符串中在字符串2和字符串3中间的字符串。</div><div class="line">``` </div><div class="line">func Between(str, starting, ending string) string &#123;</div><div class="line">	s := strings.Index(str, starting)</div><div class="line">	if s &lt; 0 &#123;</div><div class="line">		return &quot;&quot;</div><div class="line">	&#125;</div><div class="line">	s += len(starting)</div><div class="line">	e := strings.Index(str[s:], ending)</div><div class="line">	if e &lt; 0 &#123;</div><div class="line">		return &quot;&quot;</div><div class="line">	&#125;</div><div class="line">	return str[s: s+e]</div><div class="line">&#125;</div><div class="line">``` </div><div class="line">![](http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-02_23-49-48.png)</div><div class="line">最终返回类似[&apos;2017-10848&apos;,&apos;2017-10849&apos;]的字符串切片。</div><div class="line">随后构造为接口2模式的url，同样的方式进行请求，通过工具函数和regexp包，我们能够获取到页面存在的我们需要的信息。随后进行入库操作，Golang操作Mongodb用的是mgo包，基本的增删改查语法可以在https://studygolang.com/articles/1737查阅到，需要注意的是我们经常会遇到模糊查询的情况，遇到模糊查询时，可以用下面的解决办法：</div></pre></td></tr></table></figure></p>
-<p>err := mCVEdb.Find(bson.M{“cve”: bson.M{“$regex”: “CVE-2017”, “$options”: “$i”}}).Distinct(“cve”,&amp;res)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">查询数据库对象mCVEdb对应的数据库中，cve字段模糊匹配CVE-2017字样的文档，并且结果只返回cve集合。</div><div class="line">根据bson.go官方包中的规定,options参数设置为i是不分大小写的匹配，正好符合我们的需求。</div><div class="line">![](http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-11-01.png)</div><div class="line">至此，我们成功的写完了爬虫脚本并且执行后能把数据存入我们的库中。</div><div class="line">![](http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-17-38.png)</div><div class="line"></div><div class="line">## 界面的展现</div><div class="line"></div><div class="line">我们需要一个可视化平台，能够看到我们爬取到的CVE数据。搭建这个平台需要后端接口研发以及前端页面的展现。我们使用的golang http框架为beego，支持RESTful API和MVC模型。</div><div class="line">后端接口的研发：</div><div class="line">后端接口，主要是用来查询数据库中的数据并且以json格式返回。</div><div class="line">在Controller文件中写入</div></pre></td></tr></table></figure></p>
-<p>// @router /cve/ [get]<br>func (c *CveController) GetAll() {<br>    var mResultCve = new(models.CveResult)<br>    result, err := mResultCve.Cve_search_today()<br>    if err != nil {<br>        c.Data[“json”] = utils.AjaxReturn(result, “get message success”, 1)<br>    }else {<br>        c.Data[“json”] = utils.AjaxReturn(“”, “Error”, -1)<br>    }<br>    c.ServeJSON()<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">models层中定义Cve_search_today()函数，将来我们可以在http://localhost:8080/cve接口获取到返回的json数据以供前端调用。</div><div class="line">Cve_search_today()函数模糊查询time字段为当天的数据即可，将[]CVEinfo和err一同返回。</div><div class="line">前端页面的研发：</div><div class="line">首先我们需要一个页面url，在Controller中指定：</div></pre></td></tr></table></figure></p>
-<p>//@router /Cve [get]<br>func (this *CveController) GetPage() {<br>    this.Data[“title”] = “CVE信息 - “<br>    //导航的ID<br>    this.Data[“navCode”] = “opinionNavCode”<br>    this.TplName = “cveInfo/index.html”<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">随后编写cveInfo/index.html文件，利用layui+Vuejs进行开发</div><div class="line">js主要代码</div></pre></td></tr></table></figure></p>
-<p>var vm = new Vue({<br>            delimiters: [‘[[‘, ‘]]’],<br>            el: “#body_id”,<br>            data: {<br>                url: “”,<br>                cveList: [],<br>                cveNum: 0,<br>                lasttime: “”,<br>                cveTasktime: “”,<br>                date_range_list: “”<br>                //testList: [“test1”, “test2”, “test3”, “test4”]<br>            },<br>            methods: {<br>                loadData: function (ev) {<br>                    var _cveurl = “/cve”<br>                    this.cveInfoUrl(_cveurl);<br>                    this.cveTaskInfo();<br>                },<br>                initLoad: function () {<br>                    var e = {“keyCode”: 13};<br>                    this.loadData(e);<br>                },<br>                cveInfoUrl: function (url) {<br>                    var me = this;<br>                    $.ajax({<br>                        async: true,<br>                        url: url,<br>                        type: ‘get’,<br>                        datatype: ‘json’,<br>                        success: function (data) {<br>                            me.buildData(data, me)<br>                        }<br>                    });<br>                },<br>                cveTaskInfo: function () {<br>                    var me = this;<br>                    $.ajax({<br>                        async: true,<br>                        url: “/CveTaskTime”,<br>                        type: ‘get’,<br>                        datatype: ‘json’,<br>                        success: function (data) {<br>                            me.lasttime = data.data;<br>                        }<br>                    });<br>                },<br>                buildData: function (data, me) {<br>                    $(‘#cve_id’).html(“<center style="margin-top:100px"><a class="layui-btn layui-btn-disabled">数据加载中…</a></center>“);</p>
-<pre><code>            if (data.status == -1 || data.status == -5) {
-                $(&apos;#cve_id&apos;).html(&quot;&lt;center style=&apos;margin-top:100px&apos;&gt;&lt;a  class=&apos;layui-btn layui-btn-disabled&apos;&gt;暂无cve信息&lt;/a&gt;&lt;/center&gt;&quot;);
-                return false;
-            } else {
-                $(&apos;#cve_id&apos;).html(&quot;&quot;);
-            }
-            var _tmpList = data.data.CveList;
-            console.log(data.data.CveNum);
-            this.cveList = []
-            this.cveNum = data.data.CveNum;
-            for (var d in _tmpList) {
-                if (_tmpList[d].Isignored == false) {
-                    me.cveList.push({
-                        &quot;cve&quot;: _tmpList[d].Cve,
-                        &quot;keyword&quot;: _tmpList[d].Keyword,
-                        &quot;note&quot;: _tmpList[d].Note,
-                        &quot;time&quot;: _tmpList[d].Time,
-                        &quot;reference&quot;: _tmpList[d].References,
-                        &quot;isignored&quot;: _tmpList[d].Isignored
-                    });
-                }
-            }
-            for (var d in _tmpList) {
-                if (_tmpList[d].Isignored == true) {
-                    me.cveList.push({
-                        &quot;cve&quot;: _tmpList[d].Cve,
-                        &quot;keyword&quot;: _tmpList[d].Keyword,
-                        &quot;note&quot;: _tmpList[d].Note,
-                        &quot;time&quot;: _tmpList[d].Time,
-                        &quot;reference&quot;: _tmpList[d].References,
-                        &quot;isignored&quot;: _tmpList[d].Isignored
-                    });
-                }
-            }
-            console.log(me.cveList);
-        },
-
-        ignore: function (message) {
-            $.get(&apos;/cveIgnore/&apos; + message, &apos;&apos;, function (data, status) {
-                vm.buildData(data, vm)
-            })
-        },
-
-        unignore: function (message) {
-            $.get(&apos;/cveUnIgnore/&apos; + message, &apos;&apos;, function (data, status) {
-                vm.buildData(data, vm)
-            })
-        }
+<h2 id="数据库设计"><a href="#数据库设计" class="headerlink" title="数据库设计"></a>数据库设计</h2><p>由于Mongodb的灵活性与类Json形式的语法，选择其作为我们的数据库。根据需求我们需要两个表，一个表存储CVE关键字和其重要程度；领一个表存储具体爬下来的每一个条CVE详情。<br>关键字表数据格式如下（以两条信息为例）：</p>
+<pre><code>{
+&quot;_id&quot; : ObjectId(&quot;599d2c1ca9218e4e8ec4e6xx&quot;),
+&quot;keyword&quot; : [ 
+    {
+        &quot;wordname&quot; : &quot;spring&quot;,
+        &quot;wordcount&quot; : 1
+    }, 
+    {
+        &quot;wordname&quot; : &quot;java&quot;,
+        &quot;wordcount&quot; : 2
     }
-});
+}
+</code></pre><p>其中wordcount为1表示高危，wordcount为2表示中危。<br>CVE详情表数据格式如下(以一条信息为例)：</p>
+<pre><code>{
+&quot;_id&quot; : ObjectId(&quot;59a69bf70988ac81605b76xx&quot;),
+&quot;cve&quot; : &quot;CVE-2017-13758&quot;,
+&quot;keyword&quot; : &quot;ImageMagick&quot;,
+&quot;note&quot; : &quot;In ImageMagick 7.0.6-10, there is a heap-based buffer overflow in theTracePoint() function in MagickCore/draw.c.&quot;,
+&quot;time&quot; : &quot;2017-08-30 19:05:28&quot;,
+&quot;references&quot; : &quot;CONFIRM:https://www.imagemagick.org/discourse-server/viewtopic.php?f=3&amp;amp;t=32583&quot;,
+&quot;isignored&quot; : true
+}
+</code></pre><p>需要注意的是isignored字段表示是否需要忽略，在安全人员查看信息时，如果认为当前条目CVE不存在严重影响，甚至可以忽略时可以置其为忽略，而本字段记录其状态。</p>
+<h2 id="爬虫的研发"><a href="#爬虫的研发" class="headerlink" title="爬虫的研发"></a>爬虫的研发</h2><p>我们首先需要找到需要爬取的信息源，一方面需要一个接口能告知我们每日的更新，另一方面我们需要每个CVE编号对应的漏洞详情。通过CVE官网<a href="http://cve.mitre.org/，我们很快找到了两个需要的接口：" target="_blank" rel="external">http://cve.mitre.org/，我们很快找到了两个需要的接口：</a></p>
+<pre><code>https://cassandra.cerias.purdue.edu/CVE_changes/today.html
+</code></pre><p>以及</p>
+<pre><code>http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-xxxx-xxxx
+</code></pre><p>整体逻辑为向接口1发送请求，正则匹配出我们需要的【New entries】信息，如下图所示<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-02_23-17-20.png" alt=""><br>然后分别爬取每个cve对应的接口2的url，继续正则匹配出我们想要的漏洞详情信息、相关文档信息等，我们需要的信息如下。<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-02_23-29-52.png" alt=""><br>随后查keyword库判断是否为我们想要的漏洞，这里比较的是keyword与Description信息，如果是则存到库中。<br>回看整个过程，略微存在技术难点的地方在于正则表达式的编写与golang操作数据库得mgo库的利用。<br>发送请求利用的是grequest库，爬取每日CVE更新信息代码如下：</p>
+<pre><code>func monitorCVEimpl() ([]string) {
+op := grequests.RequestOptions{
+    RequestTimeout:     10 * time.Second,
+    InsecureSkipVerify: true,
+    RedirectLimit:      5,
+}
+urlStr := &quot;https://cassandra.cerias.purdue.edu/CVE_changes/today.html&quot;
+res, _ := grequests.Get(urlStr, &amp;op)
+newEntriesStr := Between(res.String(), &quot;New entries:&lt;br /&gt;&quot;, &quot;Graduations (CAN to CVE)&quot;)
+digitsRegexp := regexp.MustCompile(&quot;&lt;A HREF = &apos;(.*?)&apos;&gt;(.*?)&lt;/A&gt;&quot;)
+data := digitsRegexp.FindAllStringSubmatch(newEntriesStr, -1)
+cveStrList := []string{}
+for _, v := range data {
+    //fmt.Println(v[2])
+    if v[2] != &quot;&quot; {
+        cveStrList = append(cveStrList, v[2])
+    }
+}
+return cveStrList
+}
+</code></pre><p>其中Between函数为一个工具函数，获取一个字符串中在字符串2和字符串3中间的字符串。</p>
+<pre><code>func Between(str, starting, ending string) string {
+s := strings.Index(str, starting)
+if s &lt; 0 {
+    return &quot;&quot;
+}
+s += len(starting)
+e := strings.Index(str[s:], ending)
+if e &lt; 0 {
+    return &quot;&quot;
+}
+return str[s: s+e]
+}
+</code></pre><p><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-02_23-49-48.png" alt=""><br>最终返回类似[‘2017-10848’,’2017-10849’]的字符串切片。<br>随后构造为接口2模式的url，同样的方式进行请求，通过工具函数和regexp包，我们能够获取到页面存在的我们需要的信息。随后进行入库操作，Golang操作Mongodb用的是mgo包，基本的增删改查语法可以在<a href="https://studygolang.com/articles/1737查阅到，需要注意的是我们经常会遇到模糊查询的情况，遇到模糊查询时，可以用下面的解决办法：" target="_blank" rel="external">https://studygolang.com/articles/1737查阅到，需要注意的是我们经常会遇到模糊查询的情况，遇到模糊查询时，可以用下面的解决办法：</a></p>
+<pre><code>err := mCVEdb.Find(bson.M{&quot;cve&quot;: bson.M{&quot;$regex&quot;: &quot;CVE-2017&quot;, &quot;$options&quot;: &quot;$i&quot;}}).Distinct(&quot;cve&quot;,&amp;res)
+</code></pre><p>查询数据库对象mCVEdb对应的数据库中，cve字段模糊匹配CVE-2017字样的文档，并且结果只返回cve集合。<br>根据bson.go官方包中的规定,options参数设置为i是不分大小写的匹配，正好符合我们的需求。<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-11-01.png" alt=""><br>至此，我们成功的写完了爬虫脚本并且执行后能把数据存入我们的库中。<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-17-38.png" alt=""></p>
+<h2 id="界面的展现"><a href="#界面的展现" class="headerlink" title="界面的展现"></a>界面的展现</h2><p>我们需要一个可视化平台，能够看到我们爬取到的CVE数据。搭建这个平台需要后端接口研发以及前端页面的展现。我们使用的golang http框架为beego，支持RESTful API和MVC模型。<br>后端接口的研发：<br>后端接口，主要是用来查询数据库中的数据并且以json格式返回。<br>在Controller文件中写入</p>
+<pre><code>// @router /cve/ [get]
+func (c *CveController) GetAll() {
+var mResultCve = new(models.CveResult)
+result, err := mResultCve.Cve_search_today()
+if err != nil {
+    c.Data[&quot;json&quot;] = utils.AjaxReturn(result, &quot;get message success&quot;, 1)
+}else {
+    c.Data[&quot;json&quot;] = utils.AjaxReturn(&quot;&quot;, &quot;Error&quot;, -1)
+}
+c.ServeJSON()
+}
+</code></pre><p>models层中定义Cve_search_today()函数，将来我们可以在<a href="http://localhost:8080/cve接口获取到返回的json数据以供前端调用。" target="_blank" rel="external">http://localhost:8080/cve接口获取到返回的json数据以供前端调用。</a><br>Cve_search_today()函数模糊查询time字段为当天的数据即可，将[]CVEinfo和err一同返回。<br>前端页面的研发：<br>首先我们需要一个页面url，在Controller中指定：</p>
+<pre><code>//@router /Cve [get]
+func (this *CveController) GetPage() {
+this.Data[&quot;title&quot;] = &quot;CVE信息 - &quot;
+//导航的ID
+this.Data[&quot;navCode&quot;] = &quot;opinionNavCode&quot;
+this.TplName = &quot;cveInfo/index.html&quot;
+}
+</code></pre><p>随后编写cveInfo/index.html文件，利用layui+Vuejs进行开发<br>js主要代码</p>
+<pre><code>var vm = new Vue({
+        delimiters: [&apos;[[&apos;, &apos;]]&apos;],
+        el: &quot;#body_id&quot;,
+        data: {
+            url: &quot;&quot;,
+            cveList: [],
+            cveNum: 0,
+            lasttime: &quot;&quot;,
+            cveTasktime: &quot;&quot;,
+            date_range_list: &quot;&quot;
+            //testList: [&quot;test1&quot;, &quot;test2&quot;, &quot;test3&quot;, &quot;test4&quot;]
+        },
+        methods: {
+            loadData: function (ev) {
+                var _cveurl = &quot;/cve&quot;
+                this.cveInfoUrl(_cveurl);
+                this.cveTaskInfo();
+            },
+            initLoad: function () {
+                var e = {&quot;keyCode&quot;: 13};
+                this.loadData(e);
+            },
+            cveInfoUrl: function (url) {
+                var me = this;
+                $.ajax({
+                    async: true,
+                    url: url,
+                    type: &apos;get&apos;,
+                    datatype: &apos;json&apos;,
+                    success: function (data) {
+                        me.buildData(data, me)
+                    }
+                });
+            },
+            cveTaskInfo: function () {
+                var me = this;
+                $.ajax({
+                    async: true,
+                    url: &quot;/CveTaskTime&quot;,
+                    type: &apos;get&apos;,
+                    datatype: &apos;json&apos;,
+                    success: function (data) {
+                        me.lasttime = data.data;
+                    }
+                });
+            },
+            buildData: function (data, me) {
+                $(&apos;#cve_id&apos;).html(&quot;&lt;center style=&apos;margin-top:100px&apos;&gt;&lt;a  class=&apos;layui-btn layui-btn-disabled&apos;&gt;数据加载中...&lt;/a&gt;&lt;/center&gt;&quot;);
 
-//加载事件
-window.onload = function () {
-    vm.initLoad();
-};
-</code></pre><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">html部分v-for循环读取ajax请求返回的内容，不再详述。</div><div class="line">页面效果如图：</div><div class="line">[]!(http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-43-26.png)</div><div class="line">因为让页面更加简洁优美所以未将CVE漏洞详情信息放入页面。</div><div class="line"></div><div class="line">## 定时与实时</div><div class="line"></div><div class="line">要能够定时地完成爬取，我们就需要利用beego的Task任务模块。将开始我们编写的爬虫脚本挂载到beego框架中，然后在脚本最后加入</div></pre></td></tr></table></figure>
-<p>func CveRun() {<br>    cveSpiderRun := toolbox.NewTask(“cve_spider_run”, “0 0 7 <em> </em> *”, CveSpider)<br>    toolbox.AddTask(“cve_spider_run”, cveSpiderRun)<br>    toolbox.StartTask()<br>    defer toolbox.StopTask()<br>}<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">需要注意的是toolbox.AddTask第二个参数是脚本启动的入口函数，0 0 7 * * *为定时任务的时间设定，再此为每日的7点，我们也可以自定义设置，比如每隔10分钟等等，语法与Linux中的Crontab类似。</div><div class="line">随后在beego Controller层的DefaultController中加入</div></pre></td></tr></table></figure></p>
-<p>func init() {<br>    //初始化CVE任务<br>    cveTask.CveRun()<br>}<br>```<br>即可。<br>再此启动项目，访问8088端口(默认)，在Task中可以管理任务。<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-51-46.png" alt=""></p>
+                if (data.status == -1 || data.status == -5) {
+                    $(&apos;#cve_id&apos;).html(&quot;&lt;center style=&apos;margin-top:100px&apos;&gt;&lt;a  class=&apos;layui-btn layui-btn-disabled&apos;&gt;暂无cve信息&lt;/a&gt;&lt;/center&gt;&quot;);
+                    return false;
+                } else {
+                    $(&apos;#cve_id&apos;).html(&quot;&quot;);
+                }
+                var _tmpList = data.data.CveList;
+                console.log(data.data.CveNum);
+                this.cveList = []
+                this.cveNum = data.data.CveNum;
+                for (var d in _tmpList) {
+                    if (_tmpList[d].Isignored == false) {
+                        me.cveList.push({
+                            &quot;cve&quot;: _tmpList[d].Cve,
+                            &quot;keyword&quot;: _tmpList[d].Keyword,
+                            &quot;note&quot;: _tmpList[d].Note,
+                            &quot;time&quot;: _tmpList[d].Time,
+                            &quot;reference&quot;: _tmpList[d].References,
+                            &quot;isignored&quot;: _tmpList[d].Isignored
+                        });
+                    }
+                }
+                for (var d in _tmpList) {
+                    if (_tmpList[d].Isignored == true) {
+                        me.cveList.push({
+                            &quot;cve&quot;: _tmpList[d].Cve,
+                            &quot;keyword&quot;: _tmpList[d].Keyword,
+                            &quot;note&quot;: _tmpList[d].Note,
+                            &quot;time&quot;: _tmpList[d].Time,
+                            &quot;reference&quot;: _tmpList[d].References,
+                            &quot;isignored&quot;: _tmpList[d].Isignored
+                        });
+                    }
+                }
+                console.log(me.cveList);
+            },
+
+            ignore: function (message) {
+                $.get(&apos;/cveIgnore/&apos; + message, &apos;&apos;, function (data, status) {
+                    vm.buildData(data, vm)
+                })
+            },
+
+            unignore: function (message) {
+                $.get(&apos;/cveUnIgnore/&apos; + message, &apos;&apos;, function (data, status) {
+                    vm.buildData(data, vm)
+                })
+            }
+        }
+    });
+
+    //加载事件
+    window.onload = function () {
+        vm.initLoad();
+    };
+</code></pre><p>html部分v-for循环读取ajax请求返回的内容，不再详述。<br>页面效果如图：<br>[]!(<a href="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-43-26.png" target="_blank" rel="external">http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-43-26.png</a>)<br>因为让页面更加简洁优美所以未将CVE漏洞详情信息放入页面。</p>
+<h2 id="定时与实时"><a href="#定时与实时" class="headerlink" title="定时与实时"></a>定时与实时</h2><p>要能够定时地完成爬取，我们就需要利用beego的Task任务模块。将开始我们编写的爬虫脚本挂载到beego框架中，然后在脚本最后加入</p>
+<pre><code>func CveRun() {
+cveSpiderRun := toolbox.NewTask(&quot;cve_spider_run&quot;, &quot;0 0 7 * * *&quot;, CveSpider)
+toolbox.AddTask(&quot;cve_spider_run&quot;, cveSpiderRun)
+toolbox.StartTask()
+defer toolbox.StopTask()
+}
+</code></pre><p>需要注意的是toolbox.AddTask第二个参数是脚本启动的入口函数，0 0 7 <em> </em> *为定时任务的时间设定，再此为每日的7点，我们也可以自定义设置，比如每隔10分钟等等，语法与Linux中的Crontab类似。<br>随后在beego Controller层的DefaultController中加入</p>
+<pre><code>func init() {
+//初始化CVE任务
+cveTask.CveRun()
+}
+</code></pre><p>即可。<br>再此启动项目，访问8088端口(默认)，在Task中可以管理任务。<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-51-46.png" alt=""></p>
 <h2 id="邮件预警"><a href="#邮件预警" class="headerlink" title="邮件预警"></a>邮件预警</h2><p>在爬虫文件入库后加入邮件预警函数，内容也较为简单，低啊用github.com/go-gomail/gomail库发送html邮件，代码较为简单不再阐述，邮件正文如下<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-54-31.png" alt=""></p>
 <h2 id="总结与展望"><a href="#总结与展望" class="headerlink" title="总结与展望"></a>总结与展望</h2><p>这是上周我得一项主要任务，本项目仍可提高的点我认为有如下：<br>1.利用Golang并发编程机制加快爬虫速度<br>2.Web界面与邮件界面的UI更加优雅<br>3.多维度漏洞爬虫<br>感谢@Dean、@Mr.Hao、@tanglion在研发过程中对我的启发与帮助。<br>感谢阅读。</p>
 
