@@ -213,7 +213,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
-            Home
+            Startseite
           </a>
         </li>
       
@@ -223,7 +223,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
             
-            Categories
+            Kategorien
           </a>
         </li>
       
@@ -233,7 +233,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
             
-            About
+            Über
           </a>
         </li>
       
@@ -243,7 +243,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
-            Archives
+            Archiv
           </a>
         </li>
       
@@ -319,7 +319,7 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">Veröffentlicht am</span>
               
               <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-02T21:57:52+08:00">
                 2017-09-02
@@ -340,7 +340,7 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">In</span>
+                <span class="post-meta-item-text">in</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
@@ -383,8 +383,8 @@
       
         
           
-            <h2 id="主题"><a href="#主题" class="headerlink" title="主题"></a>主题</h2><p>在网络安全圈，攻防是核心，在攻防中漏洞的重要性不言而喻，而CVE全称Common Vulnerabilities and Exposures，是全世界通用漏洞的集合，对于安全人员来说及时知晓刚爆出的通用型漏洞对于企业来讲是十分必要的。本文讲解上周本人在完成CVE监控研发的过程中的一些技术探讨，为什么叫伪全栈呢，因为全栈远不止前端+后端。本例主要使用的技术为Golang、Vuejs、Mongodb、Beego等。</p>
-<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>具体需求为，实时爬取与【公司内部使用的开源框架/组件】相关的业内最新的CVE漏洞，进行网页展示以及邮件报警。</p>
+            <h2 id="主题"><a href="#主题" class="headerlink" title="主题"></a>主题</h2><p>在网络安全圈，攻防是核心，在攻防中漏洞的重要性不言而喻，而CVE是全世界通用漏洞的集合，对于安全人员来说及时知晓刚爆出的通用型漏洞对于企业来讲是十分必要的。本文讲解上周本人在完成CVE监控研发的过程中的一些技术探讨，为什么叫伪全栈呢，因为全栈远不止前端+后端。本例主要使用的技术为Golang、Vuejs、Mongodb、Beego等。</p>
+<h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>具体需求为，实时爬取与【公司内部使用的开源框架/组件】相关的业内最新的CVE漏洞，进行网页展示以及报警。</p>
 <h2 id="数据库设计"><a href="#数据库设计" class="headerlink" title="数据库设计"></a>数据库设计</h2><p>由于Mongodb的灵活性与类Json形式的语法，将其作为我们的数据库。根据需求我们需要两个表，一个表存储CVE关键字和其重要程度；另一个表存储具体爬下来的每一个条CVE详情。<br>关键字表数据格式如下（以两条信息为例）：</p>
 <pre><code>{
 &quot;_id&quot; : ObjectId(&quot;599d2c1ca9218e4e8ec4e6xx&quot;),
@@ -592,7 +592,7 @@ cveTask.CveRun()
 }
 </code></pre><p>即可。<br>再此启动项目，访问8088端口(默认)，在Task中可以管理任务。<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-51-46.png" alt=""></p>
 <h2 id="邮件预警"><a href="#邮件预警" class="headerlink" title="邮件预警"></a>邮件预警</h2><p>在爬虫文件入库后加入邮件预警函数，内容也较为简单，调用github.com/go-gomail/gomail库发送html邮件，主要代码为先gomail.NewMessage()创建新的Message对象，然后设置邮箱正文、头信息等，使用gomail.NewPlainDialer()配置本端邮箱的账号密码stmp信息，最后DialAndSend()发送即可，注意对异常的处理。邮件正文如下<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-54-31.png" alt=""></p>
-<h2 id="总结与展望"><a href="#总结与展望" class="headerlink" title="总结与展望"></a>总结与展望</h2><p>本项目仍可提高的点我认为有如下：<br>1.利用Golang并发编程机制加快爬虫速度<br>2.Web界面与邮件界面的UI更加优雅<br>3.多维度漏洞爬虫<br>感谢@Dean、@Mr.Hao、@tanglion在研发过程中对我的启发与帮助。<br>如有错误还请帮指出，感谢阅读。</p>
+<h2 id="总结与展望"><a href="#总结与展望" class="headerlink" title="总结与展望"></a>总结与展望</h2><p>本项目仍可提高的点我认为有如下：<br>1.利用Golang并发编程机制加快爬虫速度<br>2.Web界面与邮件界面的UI更加优雅<br>3.多维度漏洞爬虫<br>感谢@Dean、@Mr.Hao、@tanglion在研发过程中对我的帮助与启发。<br>如有错误还请帮指出，感谢阅读。</p>
 
           
         
@@ -670,7 +670,7 @@ cveTask.CveRun()
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">Veröffentlicht am</span>
               
               <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-26T19:31:03+08:00">
                 2017-08-26
@@ -691,7 +691,7 @@ cveTask.CveRun()
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">In</span>
+                <span class="post-meta-item-text">in</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
@@ -737,7 +737,7 @@ cveTask.CveRun()
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/08/26/python-基于nmap多线程扫描ms17-010脚本/">
-              Read more &raquo;
+              Weiterlesen &raquo;
             </a>
           </div>
           <!--/noindex-->
@@ -816,7 +816,7 @@ cveTask.CveRun()
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">Veröffentlicht am</span>
               
               <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-21T16:24:23+08:00">
                 2017-08-21
@@ -837,7 +837,7 @@ cveTask.CveRun()
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">In</span>
+                <span class="post-meta-item-text">in</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
@@ -966,7 +966,7 @@ cveTask.CveRun()
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">Veröffentlicht am</span>
               
               <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-21T14:34:13+08:00">
                 2017-08-21
@@ -1099,7 +1099,7 @@ cveTask.CveRun()
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
                 <span class="site-state-item-count">4</span>
-                <span class="site-state-item-name">posts</span>
+                <span class="site-state-item-name">Artikel</span>
               </a>
             </div>
           
@@ -1110,7 +1110,7 @@ cveTask.CveRun()
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
                 <span class="site-state-item-count">1</span>
-                <span class="site-state-item-name">categories</span>
+                <span class="site-state-item-name">Kategorien</span>
               </a>
             </div>
           
@@ -1121,7 +1121,7 @@ cveTask.CveRun()
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
                 <span class="site-state-item-count">7</span>
-                <span class="site-state-item-name">tags</span>
+                <span class="site-state-item-name">Tags</span>
               </a>
             </div>
           
@@ -1249,7 +1249,7 @@ cveTask.CveRun()
 </div>
 
 
-  <div class="powered-by">Powered by <a class="theme-link" href="https://hexo.io">Hexo</a></div>
+  <div class="powered-by">Erstellt mit  <a class="theme-link" href="https://hexo.io">Hexo</a></div>
 
   <span class="post-meta-divider">|</span>
 
