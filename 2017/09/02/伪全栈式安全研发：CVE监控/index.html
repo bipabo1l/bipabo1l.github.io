@@ -96,13 +96,13 @@
 
 
 
-<meta name="description" content="主题在网络安全圈，攻防是核心，在攻防中漏洞的重要性不言而喻，而CVE全称Common Vulnerabilities and Exposures，是全世界通用漏洞的集合，对于安全人员来说及时知晓刚爆出的通用型漏洞对于企业来讲是十分必要的。本文讲解上周本人在完成CVE监控研发的过程中的一些技术探讨。主要使用的技术为Golang、Vuejs、Mongodb、Beego等。 需求具体需求为，实时爬取与【">
+<meta name="description" content="主题在网络安全圈，攻防是核心，在攻防中漏洞的重要性不言而喻，而CVE全称Common Vulnerabilities and Exposures，是全世界通用漏洞的集合，对于安全人员来说及时知晓刚爆出的通用型漏洞对于企业来讲是十分必要的。本文讲解上周本人在完成CVE监控研发的过程中的一些技术探讨，为什么叫伪全栈呢，因为全栈远不止前端+后端。本例主要使用的技术为Golang、Vuejs、Mongod">
 <meta name="keywords" content="Golang,Vuejs,Mongodb,Beego">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CVE监控：从爬虫到前后端到实时预警的全栈式研发">
-<meta property="og:url" content="http://yoursite.com/2017/09/02/CVE监控：从爬虫到前后端到实时预警的全栈式研发/index.html">
+<meta property="og:title" content="伪全栈式安全研发：CVE监控">
+<meta property="og:url" content="http://yoursite.com/2017/09/02/伪全栈式安全研发：CVE监控/index.html">
 <meta property="og:site_name" content="Bipabo1l&#39;s Blog">
-<meta property="og:description" content="主题在网络安全圈，攻防是核心，在攻防中漏洞的重要性不言而喻，而CVE全称Common Vulnerabilities and Exposures，是全世界通用漏洞的集合，对于安全人员来说及时知晓刚爆出的通用型漏洞对于企业来讲是十分必要的。本文讲解上周本人在完成CVE监控研发的过程中的一些技术探讨。主要使用的技术为Golang、Vuejs、Mongodb、Beego等。 需求具体需求为，实时爬取与【">
+<meta property="og:description" content="主题在网络安全圈，攻防是核心，在攻防中漏洞的重要性不言而喻，而CVE全称Common Vulnerabilities and Exposures，是全世界通用漏洞的集合，对于安全人员来说及时知晓刚爆出的通用型漏洞对于企业来讲是十分必要的。本文讲解上周本人在完成CVE监控研发的过程中的一些技术探讨，为什么叫伪全栈呢，因为全栈远不止前端+后端。本例主要使用的技术为Golang、Vuejs、Mongod">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-02_23-17-20.png">
 <meta property="og:image" content="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-02_23-29-52.png">
@@ -112,10 +112,10 @@
 <meta property="og:image" content="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-43-26.png">
 <meta property="og:image" content="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-51-46.png">
 <meta property="og:image" content="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-54-31.png">
-<meta property="og:updated_time" content="2017-09-02T18:08:29.462Z">
+<meta property="og:updated_time" content="2017-09-02T18:27:18.323Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="CVE监控：从爬虫到前后端到实时预警的全栈式研发">
-<meta name="twitter:description" content="主题在网络安全圈，攻防是核心，在攻防中漏洞的重要性不言而喻，而CVE全称Common Vulnerabilities and Exposures，是全世界通用漏洞的集合，对于安全人员来说及时知晓刚爆出的通用型漏洞对于企业来讲是十分必要的。本文讲解上周本人在完成CVE监控研发的过程中的一些技术探讨。主要使用的技术为Golang、Vuejs、Mongodb、Beego等。 需求具体需求为，实时爬取与【">
+<meta name="twitter:title" content="伪全栈式安全研发：CVE监控">
+<meta name="twitter:description" content="主题在网络安全圈，攻防是核心，在攻防中漏洞的重要性不言而喻，而CVE全称Common Vulnerabilities and Exposures，是全世界通用漏洞的集合，对于安全人员来说及时知晓刚爆出的通用型漏洞对于企业来讲是十分必要的。本文讲解上周本人在完成CVE监控研发的过程中的一些技术探讨，为什么叫伪全栈呢，因为全栈远不止前端+后端。本例主要使用的技术为Golang、Vuejs、Mongod">
 <meta name="twitter:image" content="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-02_23-17-20.png">
 
 
@@ -146,13 +146,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/09/02/CVE监控：从爬虫到前后端到实时预警的全栈式研发/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/09/02/伪全栈式安全研发：CVE监控/"/>
 
 
 
 
 
-  <title>CVE监控：从爬虫到前后端到实时预警的全栈式研发 | Bipabo1l's Blog</title>
+  <title>伪全栈式安全研发：CVE监控 | Bipabo1l's Blog</title>
   
 
 
@@ -222,7 +222,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
-            Accueil
+            Home
           </a>
         </li>
       
@@ -242,7 +242,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
             
-            A propos
+            About
           </a>
         </li>
       
@@ -299,7 +299,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/02/CVE监控：从爬虫到前后端到实时预警的全栈式研发/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/02/伪全栈式安全研发：CVE监控/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Bipabo1l">
@@ -316,7 +316,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">CVE监控：从爬虫到前后端到实时预警的全栈式研发</h1>
+          <h1 class="post-title" itemprop="name headline">伪全栈式安全研发：CVE监控</h1>
         
 
         <div class="post-meta">
@@ -326,7 +326,7 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posté le</span>
+                <span class="post-meta-item-text">Posted on</span>
               
               <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-02T21:57:52+08:00">
                 2017-09-02
@@ -388,7 +388,7 @@
       
 
       
-        <h2 id="主题"><a href="#主题" class="headerlink" title="主题"></a>主题</h2><p>在网络安全圈，攻防是核心，在攻防中漏洞的重要性不言而喻，而CVE全称Common Vulnerabilities and Exposures，是全世界通用漏洞的集合，对于安全人员来说及时知晓刚爆出的通用型漏洞对于企业来讲是十分必要的。本文讲解上周本人在完成CVE监控研发的过程中的一些技术探讨。主要使用的技术为Golang、Vuejs、Mongodb、Beego等。</p>
+        <h2 id="主题"><a href="#主题" class="headerlink" title="主题"></a>主题</h2><p>在网络安全圈，攻防是核心，在攻防中漏洞的重要性不言而喻，而CVE全称Common Vulnerabilities and Exposures，是全世界通用漏洞的集合，对于安全人员来说及时知晓刚爆出的通用型漏洞对于企业来讲是十分必要的。本文讲解上周本人在完成CVE监控研发的过程中的一些技术探讨，为什么叫伪全栈呢，因为全栈远不止前端+后端。本例主要使用的技术为Golang、Vuejs、Mongodb、Beego等。</p>
 <h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>具体需求为，实时爬取与【公司内部使用的开源框架/组件】相关的业内最新的CVE漏洞，进行网页展示以及邮件报警。</p>
 <h2 id="数据库设计"><a href="#数据库设计" class="headerlink" title="数据库设计"></a>数据库设计</h2><p>由于Mongodb的灵活性与类Json形式的语法，将其作为我们的数据库。根据需求我们需要两个表，一个表存储CVE关键字和其重要程度；另一个表存储具体爬下来的每一个条CVE详情。<br>关键字表数据格式如下（以两条信息为例）：</p>
 <pre><code>{
@@ -596,7 +596,7 @@ defer toolbox.StopTask()
 cveTask.CveRun()
 }
 </code></pre><p>即可。<br>再此启动项目，访问8088端口(默认)，在Task中可以管理任务。<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-51-46.png" alt=""></p>
-<h2 id="邮件预警"><a href="#邮件预警" class="headerlink" title="邮件预警"></a>邮件预警</h2><p>在爬虫文件入库后加入邮件预警函数，内容也较为简单，低啊用github.com/go-gomail/gomail库发送html邮件，代码较为简单不再阐述，邮件正文如下<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-54-31.png" alt=""></p>
+<h2 id="邮件预警"><a href="#邮件预警" class="headerlink" title="邮件预警"></a>邮件预警</h2><p>在爬虫文件入库后加入邮件预警函数，内容也较为简单，调用github.com/go-gomail/gomail库发送html邮件，主要代码为先gomail.NewMessage()创建新的Message对象，然后设置邮箱正文、头信息等，使用gomail.NewPlainDialer()配置本端邮箱的账号密码stmp信息，最后DialAndSend()发送即可，注意对异常的处理。邮件正文如下<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-03_00-54-31.png" alt=""></p>
 <h2 id="总结与展望"><a href="#总结与展望" class="headerlink" title="总结与展望"></a>总结与展望</h2><p>本项目仍可提高的点我认为有如下：<br>1.利用Golang并发编程机制加快爬虫速度<br>2.Web界面与邮件界面的UI更加优雅<br>3.多维度漏洞爬虫<br>感谢@Dean、@Mr.Hao、@tanglion在研发过程中对我的启发与帮助。<br>如有错误还请帮指出，感谢阅读。</p>
 
       
@@ -724,10 +724,10 @@ var jiathis_config={
       
         <ul class="sidebar-nav motion-element">
           <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            Table Des Matières
+            Table of Contents
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview">
-            Ensemble
+            Overview
           </li>
         </ul>
       
@@ -748,7 +748,7 @@ var jiathis_config={
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
                 <span class="site-state-item-count">4</span>
-                <span class="site-state-item-name">articles</span>
+                <span class="site-state-item-name">posts</span>
               </a>
             </div>
           
@@ -918,7 +918,7 @@ var jiathis_config={
 
   <span class="post-meta-divider">|</span>
 
-  <div class="theme-info">Thème &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.2</div>
+  <div class="theme-info">Theme &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.2</div>
 
 
         
