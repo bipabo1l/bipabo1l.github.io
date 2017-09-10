@@ -78,7 +78,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="golang python" />
+  <meta name="keywords" content="Android,渗透测试,ZipEntry," />
 
 
 
@@ -96,16 +96,24 @@
 
 
 
-<meta name="description" content="on the way.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Bipabo1l&#39;s Blog">
-<meta property="og:url" content="http://yoursite.com/tags/wannaCry/index.html">
+<meta name="description" content="介绍在Android APK加载时，通常情况下会请求各种资源，这其中就包括请求本地或者外部服务器的压缩文件。而由于zip格式压缩文件允许”../“的字符串，攻击者可以在APK加载时对应用本来想加载的文件进行“调虎离山”，将自己利用多个”../“生成的压缩文件替换原文件，这种情况下如果APK对这个zip文件解析不当，那么轻则导致文件覆盖，重则导致本地拒绝服务，甚至代码执行。 漏洞原理这里以一个Apk">
+<meta name="keywords" content="Android,渗透测试,ZipEntry">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅析Android中ZipEntry漏洞">
+<meta property="og:url" content="http://yoursite.com/2017/09/10/浅析Android中ZipEntry漏洞/index.html">
 <meta property="og:site_name" content="Bipabo1l&#39;s Blog">
-<meta property="og:description" content="on the way.">
+<meta property="og:description" content="介绍在Android APK加载时，通常情况下会请求各种资源，这其中就包括请求本地或者外部服务器的压缩文件。而由于zip格式压缩文件允许”../“的字符串，攻击者可以在APK加载时对应用本来想加载的文件进行“调虎离山”，将自己利用多个”../“生成的压缩文件替换原文件，这种情况下如果APK对这个zip文件解析不当，那么轻则导致文件覆盖，重则导致本地拒绝服务，甚至代码执行。 漏洞原理这里以一个Apk">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ovnsp3bhk.bkt.clouddn.com/a3f3b1d75ac84edea68aa7298461cdc9.png">
+<meta property="og:image" content="http://ovnsp3bhk.bkt.clouddn.com/1475713e45644a3283d617c93644fbf1.png">
+<meta property="og:image" content="http://ovnsp3bhk.bkt.clouddn.com/5754c55d4c344a51aaf154ed0e83239b.png">
+<meta property="og:image" content="http://ovnsp3bhk.bkt.clouddn.com/8f9dbd6785564952b741951744f0507a.png">
+<meta property="og:image" content="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-11_00-08-22.png">
+<meta property="og:updated_time" content="2017-09-10T16:09:49.013Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Bipabo1l&#39;s Blog">
-<meta name="twitter:description" content="on the way.">
+<meta name="twitter:title" content="浅析Android中ZipEntry漏洞">
+<meta name="twitter:description" content="介绍在Android APK加载时，通常情况下会请求各种资源，这其中就包括请求本地或者外部服务器的压缩文件。而由于zip格式压缩文件允许”../“的字符串，攻击者可以在APK加载时对应用本来想加载的文件进行“调虎离山”，将自己利用多个”../“生成的压缩文件替换原文件，这种情况下如果APK对这个zip文件解析不当，那么轻则导致文件覆盖，重则导致本地拒绝服务，甚至代码执行。 漏洞原理这里以一个Apk">
+<meta name="twitter:image" content="http://ovnsp3bhk.bkt.clouddn.com/a3f3b1d75ac84edea68aa7298461cdc9.png">
 
 
 
@@ -135,13 +143,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/tags/wannaCry/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/09/10/浅析Android中ZipEntry漏洞/"/>
 
 
 
 
 
-  <title>Tag: wannaCry | Bipabo1l's Blog</title>
+  <title>浅析Android中ZipEntry漏洞 | Bipabo1l's Blog</title>
   
 
 
@@ -170,7 +178,7 @@
     
   
 
-  <div class="container sidebar-position-left  ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -274,54 +282,201 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block tag">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>wannaCry<small>Tag</small>
-        </h1>
-      </div>
+  
 
-      
-        
+  
+  
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/10/浅析Android中ZipEntry漏洞/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Bipabo1l">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://img11.360buyimg.com/ee/jfs/t6790/284/2278650655/136645/39cd6a81/598b0aa7N1f2bda3c.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Bipabo1l's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2017/08/26/python-基于nmap多线程扫描ms17-010脚本/" itemprop="url">
-              
-                <span itemprop="name">python 基于nmap多线程扫描ms17-010脚本</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">浅析Android中ZipEntry漏洞</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-08-26T19:31:03+08:00"
-              content="2017-08-26" >
-          08-26
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-10T23:19:30+08:00">
+                2017-09-10
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">in</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/漏洞研究/" itemprop="url" rel="index">
+                    <span itemprop="name">漏洞研究</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在Android APK加载时，通常情况下会请求各种资源，这其中就包括请求本地或者外部服务器的压缩文件。而由于zip格式压缩文件允许”../“的字符串，攻击者可以在APK加载时对应用本来想加载的文件进行“调虎离山”，将自己利用多个”../“生成的压缩文件替换原文件，这种情况下如果APK对这个zip文件解析不当，那么轻则导致文件覆盖，重则导致本地拒绝服务，甚至代码执行。</p>
+<h2 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h2><p>这里以一个Apk为例说明，下图中，我反编译了一个APK，获取到了dex文件，利用dex2jar转换成了java中的jar文件并利用Java Decomplier进行读取。<br>定位到存在ZipEntry漏洞的地方，如下图所示：<br><img src="http://ovnsp3bhk.bkt.clouddn.com/a3f3b1d75ac84edea68aa7298461cdc9.png" alt=""><br>可以发现代码的逻辑时调用zipEntry类中的getName()方法，获取到解压到的Zip文件中的自文件名称，但是并未进行任何的../过滤，从而允许了攻击者构造../的zip包进行攻击的可能，攻击者可以构造精心构造的zip包，在root过的手机中抓包，对包含zip的调用包进行篡改，将原zip包篡改成本地构造后的zip包，随后在本地查看文件管理器，可以发现攻击者指定的目录下的文件。<br>构造特定的zip包代码如下：（使用java编写）<br><img src="http://ovnsp3bhk.bkt.clouddn.com/1475713e45644a3283d617c93644fbf1.png" alt=""><br>执行后在zippoc根目录下可发现新生成的test.zip文件<br><img src="http://ovnsp3bhk.bkt.clouddn.com/5754c55d4c344a51aaf154ed0e83239b.png" alt=""><br><img src="http://ovnsp3bhk.bkt.clouddn.com/8f9dbd6785564952b741951744f0507a.png" alt=""><br>上传包中篡改该文件即可。<br>修复方案为在上传包中对文件名进行严格的校验，过滤”../“</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>该漏洞为移动安全漏洞中的低危或中危漏洞，其实不是很好利用，利用方式略微鸡肋但是影响却不小，但很多厂商并未对其进行过多的校验。笔者就发现了滴滴代驾司机客户端、斗鱼Android客户端、Wifi万能钥匙客户端等等均存在此漏洞并进行了报告。<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-11_00-08-22.png" alt=""><br>该漏洞如果结合了其他漏洞也会产生较为严重的影响，希望厂商予以重视。</p>
 
       
     </div>
+    
+    
+    
 
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/渗透测试/" rel="tag"># 渗透测试</a>
+          
+            <a href="/tags/ZipEntry/" rel="tag"># ZipEntry</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/02/伪全栈式安全研发：CVE监控/" rel="next" title="伪全栈式安全研发：CVE监控">
+                <i class="fa fa-chevron-left"></i> 伪全栈式安全研发：CVE监控
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+<span class="jiathis_txt">分享到：</span>
+<a class="jiathis_button_fav">收藏夹</a>
+<a class="jiathis_button_copy">复制网址</a>
+<a class="jiathis_button_email">邮件</a>
+<a class="jiathis_button_weixin">微信</a>
+<a class="jiathis_button_qzone">QQ空间</a>
+<a class="jiathis_button_tqq">腾讯微薄</a>
+<a class="jiathis_button_douban">豆瓣</a>
+<a class="jiathis_button_share">一键分享</a>
+
+<a href="http://www.jiathis.com/share?uid=2140465" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank">更多</a>
+<a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+var jiathis_config={
+  data_track_clickback:true,
+  summary:"",
+  shortUrl:false,
+  hideMore:false
+}
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+      
+    </div>
+  </div>
 
 
           </div>
@@ -329,6 +484,12 @@
 
 
           
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMDQxNC82OTY4"></div>
+    
+  </div>
+
 
         </div>
         
@@ -349,8 +510,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://img11.360buyimg.com/ee/jfs/t6790/284/2278650655/136645/39cd6a81/598b0aa7N1f2bda3c.jpg"
@@ -512,6 +682,22 @@
       </section>
 
       
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漏洞原理"><span class="nav-number">2.</span> <span class="nav-text">漏洞原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">3.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
 
       
 
@@ -627,10 +813,10 @@
   
 
   
-    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
 <script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
 
-  
+
 
   
 
@@ -659,6 +845,17 @@
 
 
 
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
   
 
 

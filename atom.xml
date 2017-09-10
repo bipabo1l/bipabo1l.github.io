@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2017-09-02T18:32:30.588Z</updated>
+  <updated>2017-09-10T16:09:49.013Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -14,6 +14,35 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>浅析Android中ZipEntry漏洞</title>
+    <link href="http://yoursite.com/2017/09/10/%E6%B5%85%E6%9E%90Android%E4%B8%ADZipEntry%E6%BC%8F%E6%B4%9E/"/>
+    <id>http://yoursite.com/2017/09/10/浅析Android中ZipEntry漏洞/</id>
+    <published>2017-09-10T15:19:30.000Z</published>
+    <updated>2017-09-10T16:09:49.013Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在Android APK加载时，通常情况下会请求各种资源，这其中就包括请求本地或者外部服务器的压缩文件。而由于zip格式压缩文件允许”../“的字符串，攻击者可以在APK加载时对应用本来想加载的文件进行“调虎离山”，将自己利用多个”../“生成的压缩文件替换原文件，这种情况下如果APK对这个zip文件解析不当，那么轻则导致文件覆盖，重则导致本地拒绝服务，甚至代码执行。</p>
+<h2 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h2><p>这里以一个Apk为例说明，下图中，我反编译了一个APK，获取到了dex文件，利用dex2jar转换成了java中的jar文件并利用Java Decomplier进行读取。<br>定位到存在ZipEntry漏洞的地方，如下图所示：<br><img src="http://ovnsp3bhk.bkt.clouddn.com/a3f3b1d75ac84edea68aa7298461cdc9.png" alt=""><br>可以发现代码的逻辑时调用zipEntry类中的getName()方法，获取到解压到的Zip文件中的自文件名称，但是并未进行任何的../过滤，从而允许了攻击者构造../的zip包进行攻击的可能，攻击者可以构造精心构造的zip包，在root过的手机中抓包，对包含zip的调用包进行篡改，将原zip包篡改成本地构造后的zip包，随后在本地查看文件管理器，可以发现攻击者指定的目录下的文件。<br>构造特定的zip包代码如下：（使用java编写）<br><img src="http://ovnsp3bhk.bkt.clouddn.com/1475713e45644a3283d617c93644fbf1.png" alt=""><br>执行后在zippoc根目录下可发现新生成的test.zip文件<br><img src="http://ovnsp3bhk.bkt.clouddn.com/5754c55d4c344a51aaf154ed0e83239b.png" alt=""><br><img src="http://ovnsp3bhk.bkt.clouddn.com/8f9dbd6785564952b741951744f0507a.png" alt=""><br>上传包中篡改该文件即可。<br>修复方案为在上传包中对文件名进行严格的校验，过滤”../“</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>该漏洞为移动安全漏洞中的低危或中危漏洞，其实不是很好利用，利用方式略微鸡肋但是影响却不小，但很多厂商并未对其进行过多的校验。笔者就发现了滴滴代驾司机客户端、斗鱼Android客户端、Wifi万能钥匙客户端等等均存在此漏洞并进行了报告。<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-11_00-08-22.png" alt=""><br>该漏洞如果结合了其他漏洞也会产生较为严重的影响，希望厂商予以重视。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;介绍&quot;&gt;&lt;a href=&quot;#介绍&quot; class=&quot;headerlink&quot; title=&quot;介绍&quot;&gt;&lt;/a&gt;介绍&lt;/h2&gt;&lt;p&gt;在Android APK加载时，通常情况下会请求各种资源，这其中就包括请求本地或者外部服务器的压缩文件。而由于zip格式压缩文件允许”../
+    
+    </summary>
+    
+      <category term="漏洞研究" scheme="http://yoursite.com/categories/%E6%BC%8F%E6%B4%9E%E7%A0%94%E7%A9%B6/"/>
+    
+    
+      <category term="Android" scheme="http://yoursite.com/tags/Android/"/>
+    
+      <category term="渗透测试" scheme="http://yoursite.com/tags/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/"/>
+    
+      <category term="ZipEntry" scheme="http://yoursite.com/tags/ZipEntry/"/>
+    
+  </entry>
   
   <entry>
     <title>伪全栈式安全研发：CVE监控</title>
