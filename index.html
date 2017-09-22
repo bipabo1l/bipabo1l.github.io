@@ -290,6 +290,213 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/22/解决golang-post-xml数据带header时502bad-gateway-的问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Bipabo1l">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://img11.360buyimg.com/ee/jfs/t6790/284/2278650655/136645/39cd6a81/598b0aa7N1f2bda3c.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Bipabo1l's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/09/22/解决golang-post-xml数据带header时502bad-gateway-的问题/" itemprop="url">记一次golang post xml时返回502错误码的问题</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-22T11:28:58+08:00">
+                2017-09-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/安全研发/" itemprop="url" rel="index">
+                    <span itemprop="name">安全研发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="详情"><a href="#详情" class="headerlink" title="详情"></a>详情</h2><p>昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。</p>
+<p>Python代码如下：</p>
+<pre><code># coding=utf-8
+
+import requests
+import cgi
+
+def send(phone, msg):
+    url = &apos;http://xxx.com/MoblMsgSender&apos;
+    headers = {
+        &apos;Host&apos;: &apos;xxx.com&apos;,
+    }
+    body = &apos;&lt;?xml version=&quot;1.0&quot; ?&gt;&lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&lt;S:Header&gt;&lt;AuthenticationHeader xmlns=&quot;http://xxx.com/MoblMsgSender&quot;&gt;&lt;Token&gt;Tokenxxx==&lt;/Token&gt;&lt;/AuthenticationHeader&gt;&lt;/S:Header&gt;&lt;S:Body&gt;&lt;ns2:xxMmSender xmlns:ns2=&quot;http://xxx.com/&quot;&gt;&lt;arg0 xmlns=&quot;&quot;&gt;%s&lt;/arg0&gt;&lt;arg1 xmlns=&quot;&quot;&gt;%s&lt;/arg1&gt;&lt;arg2 xmlns=&quot;&quot;&gt;yunwei.alarm&lt;/arg2&gt;&lt;arg3 xmlns=&quot;&quot;&gt;&lt;/arg3&gt;&lt;/ns2:xxMmSender&gt;&lt;/S:Body&gt;&lt;/S:Envelope&gt;&apos; % (phone, cgi.escape(msg))
+    try:
+        r = requests.post(url, data=body, headers=headers)
+        if &apos;&lt;return&gt;true&lt;/return&gt;&apos; in r.content:
+            return True
+    except:
+        pass
+    return False
+
+send(&quot;135xxxxxxx&quot;,&quot;testPython&quot;)
+</code></pre><p>果然成功收到了短信，证明接口调用成功。<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-22_11-51-57.png" alt=""><br>于是我转化成golang代码：</p>
+<pre><code>package main
+
+import (
+    &quot;bytes&quot;
+    &quot;crypto/tls&quot;
+    &quot;log&quot;
+    &quot;net/http&quot;
+    &quot;strings&quot;
+    &quot;time&quot;
+)
+
+func sendmessage(phone string, msg string) error {
+    uri := `http://xxx.com/MoblMsgSender`
+    //proxy, _ := url.Parse(&quot;http://127.0.0.1:8080&quot;)
+    tr := &amp;http.Transport{
+        //Proxy:           http.ProxyURL(proxy),
+        TLSClientConfig: &amp;tls.Config{InsecureSkipVerify: true},
+    }
+    client := &amp;http.Client{
+        Transport: tr,
+        Timeout:   time.Second * 5, //超时时间
+    }
+    body := `&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&lt;S:Header&gt;&lt;AuthenticationHeader xmlns=&quot;http://mms.360buy.com/services/MoblMsgSender&quot;&gt;&lt;Token&gt;666a8EN3oIijHY+KjS+2mg==&lt;/Token&gt;&lt;/AuthenticationHeader&gt;&lt;/S:Header&gt;&lt;S:Body&gt;&lt;ns2:xxMmSender xmlns:ns2=&quot;http://xxx.com/&quot;&gt;&lt;arg0 xmlns=&quot;&quot;&gt;` + phone + `&lt;/arg0&gt;&lt;arg1 xmlns=&quot;&quot;&gt;` +     msg + `&lt;/arg1&gt;&lt;arg2 xmlns=&quot;&quot;&gt;yunwei.alarm&lt;/arg2&gt;&lt;arg3     xmlns=&quot;&quot;&gt;&lt;/arg3&gt;&lt;/ns2:xxMmSender&gt;&lt;/S:Body&gt;&lt;/    S:Envelope&gt;`
+    log.Println(strings.NewReader(body))
+    req, err := http.NewRequest(&quot;post&quot;, uri,     bytes.NewBuffer([]byte(body)))
+    if err != nil {
+        log.Println(err)
+        // handle error
+    }
+    req.Host = &quot;xxx.com&quot;
+    resp, err := client.Do(req)
+    if err != nil {
+        log.Println(err)
+    }
+    log.Println(resp)
+    //log.Println(respbody)
+    return err
+}
+
+func main() {
+    sendmessage(&quot;135xxxxxxx&quot;, &quot;testGolang&quot;)
+}
+</code></pre><p>然而我发现此请求并没有获取到短信，于是挂上代理进行抓包，发现其响应码为502.<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-22_14-08-08.png" alt=""><br>对比Python的正常请求：<br><img src="http://ovnsp3bhk.bkt.clouddn.com/Snipaste_2017-09-22_14-12-11.png" alt=""><br>发现是因为http.NewRequest()方法第一个参数options方法写错了，不能写成小写..</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/10/浅析Android中ZipEntry漏洞/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1242,7 +1449,7 @@ cveTask.CveRun()
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">6</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
@@ -1264,7 +1471,7 @@ cveTask.CveRun()
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">tags</span>
               </a>
             </div>
