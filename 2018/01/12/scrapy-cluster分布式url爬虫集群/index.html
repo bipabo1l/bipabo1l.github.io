@@ -1,17 +1,67 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> scrapy-cluster分布式url爬虫集群 · Bipabo1l's Blog</title><meta name="description" content="scrapy-cluster分布式url爬虫集群 - Bipabo1l"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://yoursite.com/atom.xml" title="Bipabo1l's Blog"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/2610095341/profile" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/bipabo1l" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">scrapy-cluster分布式url爬虫集群</h1><div class="post-info">2018年1月12日</div><div class="post-content"><h2 id="主题"><a href="#主题" class="headerlink" title="主题"></a>主题</h2><p>一个企业如何做到足够的安全？相信很多措施是必不可少的，其中收集足够多的公司资产和有一个足够强大的黑盒扫描爬虫是十分必要的，做好了这两条我们便知道我们的企业有什么需要保护的，并且能够保证这些需要保护的东西在黑客视野下难以侵入。但企业中大多数的资产是domain和ip，我们如果能够针对每个domain,为黑盒扫描器提供更全的url信息，会使我们的防御更全面。最近笔者就干了一件类似的事，大致说来通过基于Scrapy Cluster的框架将爬取出我们需要的包信息，从Kafka中过滤出url数据，然后通过url相似性去重对url去重，最终将结果存入mongodb持久化存储并建立http server进行API数据输出。与本文涉及的代码已经上传到笔者的github:<a href="https://github.com/bipabo1l/scrapycluster_url_processing。url去重部分参考了dean的urlclean" target="_blank" rel="external">https://github.com/bipabo1l/scrapycluster_url_processing。url去重部分参考了dean的urlclean</a> golang项目。</p>
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> scrapy-cluster分布式url爬虫集群 · Bipabo1l's Blog</title><meta name="description" content="scrapy-cluster分布式url爬虫集群 - Bipabo1l"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://yoursite.com/atom.xml" title="Bipabo1l's Blog"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="http://weibo.com/2610095341/profile" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/bipabo1l" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">scrapy-cluster分布式url爬虫集群</h1><div class="post-info">2018年1月12日</div><div class="post-content"><h2 id="主题"><a href="#主题" class="headerlink" title="主题"></a>主题</h2><p>一个企业如何做到足够的安全？相信很多措施是必不可少的，其中收集足够多的公司资产和有一个足够强大的黑盒扫描爬虫是十分必要的，做好了这两条我们便知道我们的企业有什么需要保护的，并且能够保证这些需要保护的东西在黑客视野下难以侵入。但企业中大多数的资产是domain和ip，我们如果能够针对每个domain,为黑盒扫描器提供更全的url信息，会使我们的防御更全面。最近笔者就干了一件类似的事，大致说来通过基于Scrapy Cluster的框架将爬取出我们需要的包信息，从Kafka中过滤出url数据，然后通过url相似性去重对url去重，最终将结果存入mongodb持久化存储并建立http server进行API数据输出。与本文涉及的代码已经上传到笔者的github:<code>https://github.com/bipabo1l/scrapycluster_url_processing</code>。url去重部分参考了dean的urlclean golang项目。</p>
 <a id="more"></a>
 <h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p>架构图如下，画的较丑见谅；<br><img src="http://ovnsp3bhk.bkt.clouddn.com/11.png" alt=""></p>
 <h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><p>我们拥有的资源是三台内网机器，在本文将以127.0.0.1，127.0.0.2，127.0.0.3表示。</p>
 <h2 id="scrapy-cluster集群搭建"><a href="#scrapy-cluster集群搭建" class="headerlink" title="scrapy-cluster集群搭建"></a>scrapy-cluster集群搭建</h2><p>先通过cdh将三台集群自动下载与配置好kafka+zookeeper环境。<br><img src="http://ovnsp3bhk.bkt.clouddn.com/12.png" alt=""></p>
-<p>利用cdh安装两大组件后，测试kafka+zookeeper集群搭建是否成功<br>127.0.0.1上创建topic<br>    kafka-topics –create –zookeeper 127.0.0.2:2181 –replication-factor 1 –partitions 1 –topic test</p>
-<p><img src="http://ovnsp3bhk.bkt.clouddn.com/13.png" alt=""><br>127.0.0.2上查看名为test的topic<br>    kafka-topics –describe –zookeeper 127.0.0.1:2181 –topic test<br><img src="http://ovnsp3bhk.bkt.clouddn.com/14.png" alt=""><br>查看集群中所有的 topic 列表<br>    kafka-topics –list –zookeeper 127.0.0.1:2181<br><img src="http://ovnsp3bhk.bkt.clouddn.com/15.png" alt=""><br>利用此 topic 来生产和消费<br>    kafka-console-producer –broker-list 127.0.0.1:9092 –topic test</p>
-<pre><code>kafka-console-consumer --zookeeper 127.0.0.1:2181 --topic test --from-beginning
-</code></pre><p>发现consumer可以时时消费producer生产出的数据，证明集群搭建成功。<br>在三台机器上搭建redis，python2.7环境。<br>redis：<br>    scp redis-2.8.17.tar.gz root@127.0.0.1:/export/Data<br>    tar -zvxf redis-2.8.17.tar.gz<br>    cd redis-2.8.17<br>    make<br>    cp redis-server /usr/local/bin/<br>    cp redis-cli /usr/local/bin/<br>    cp redis-check-aof /usr/local/bin/<br>    cp redis-check-dump /usr/local/bin/<br>    cp redis-benchmark /usr/local/bin/<br>vim redis.conf 将daemonize 由no设置为yes</p>
-<p>随后安装scrapy cluster集群。<br>    wget <a href="https://github.com/istresearch/scrapy-cluster/archive/v1.1.tar.gz" target="_blank" rel="external">https://github.com/istresearch/scrapy-cluster/archive/v1.1.tar.gz</a><br>    pip install -r requirements.txt<br>如果没有pip，先yum安装pip安装时可能遇到错误 Errno 14 Couldn’t resolve host<br>解决方式：<br>    vim /etc/resolv.conf<br>加入 nameserver 8.8.8.8<br>pip安装requirements.txt内所有的包时，可能会遇到些许报错：<br>No package ‘libffi’ found<br>解决方式：yum install libffi-devel<br>c/_cffi_backend.c:2:20: 致命错误： Python.h：没有那个文件或目录， 解决如下：<br>    yum install libxslt-devel<br>解决方式：sudo yum install python-devel<br><img src="http://ovnsp3bhk.bkt.clouddn.com/16.png" alt=""><br>都安装成功后，cd /export/Data/scrapy-cluster-1.1<br>离线运行单元测试,以确保一切似乎正常,表示依赖安装成功。<br>./run_offline_tests.sh<br><img src="http://ovnsp3bhk.bkt.clouddn.com/17.png" alt=""><br>证明安装成功。<br>在三个组件中新建localsettings.py文件并设置kafka，redis，zookeeper的相关配置以确保通信<br>    cd kafka-monitor/<br>    vim localsettings.py<br>    REDIS_HOST = ‘127.0.0.1’<br>    KAFKA_HOSTS = ‘127.0.0.1:9092,127.0.0.2:9092,127.0.0.3:9092’</p>
-<p>配置好后分别测试集群<br><img src="http://ovnsp3bhk.bkt.clouddn.com/18.png" alt=""><br><img src="http://ovnsp3bhk.bkt.clouddn.com/19.png" alt=""></p>
+<p>利用cdh安装两大组件后，测试kafka+zookeeper集群搭建是否成功<br>127.0.0.1上创建topic.</p>
+<pre><code>kafka-topics --create --zookeeper 127.0.0.2:2181 --replication-factor 1 --partitions 1 --topic test
+</code></pre><p><img src="http://ovnsp3bhk.bkt.clouddn.com/13.png" alt=""><br>127.0.0.2上查看名为test的topic</p>
+<pre><code>kafka-topics --describe --zookeeper 127.0.0.1:2181 --topic test
+</code></pre><p><img src="http://ovnsp3bhk.bkt.clouddn.com/14.png" alt=""><br>查看集群中所有的 topic 列表</p>
+<pre><code>kafka-topics --list --zookeeper 127.0.0.1:2181
+</code></pre><p><img src="http://ovnsp3bhk.bkt.clouddn.com/15.png" alt=""><br>利用此 topic 来生产和消费</p>
+<pre><code>kafka-console-producer --broker-list 127.0.0.1:9092 --topic test
+
+kafka-console-consumer --zookeeper 127.0.0.1:2181 --topic test --from-beginning
+</code></pre><p>发现consumer可以时时消费producer生产出的数据，证明集群搭建成功。<br>在三台机器上搭建redis，python2.7环境。<br>redis：</p>
+<pre><code>scp redis-2.8.17.tar.gz root@127.0.0.1:/export/Data
+tar -zvxf redis-2.8.17.tar.gz
+cd redis-2.8.17
+make
+cp redis-server /usr/local/bin/
+cp redis-cli /usr/local/bin/
+cp redis-check-aof /usr/local/bin/
+cp redis-check-dump /usr/local/bin/
+cp redis-benchmark /usr/local/bin/
+</code></pre><p>vim redis.conf 将daemonize 由no设置为yes</p>
+<p>随后安装scrapy cluster集群。</p>
+<pre><code>wget https://github.com/istresearch/scrapy-cluster/archive/v1.1.tar.gz
+pip install -r requirements.txt
+</code></pre><p>如果没有pip，先yum安装pip安装时可能遇到错误 Errno 14 Couldn’t resolve host<br>解决方式：</p>
+<pre><code>vim /etc/resolv.conf
+加入 nameserver 8.8.8.8
+</code></pre><p>pip安装requirements.txt内所有的包时，可能会遇到些许报错：<br>No package ‘libffi’ found<br>解决方式：yum install libffi-devel<br>c/_cffi_backend.c:2:20: 致命错误： Python.h：没有那个文件或目录， 解决如下：</p>
+<pre><code>yum install libxslt-devel
+</code></pre><p>解决方式：sudo yum install python-devel<br><img src="http://ovnsp3bhk.bkt.clouddn.com/16.png" alt=""><br>都安装成功后，cd /export/Data/scrapy-cluster-1.1<br>离线运行单元测试,以确保一切似乎正常,表示依赖安装成功。<br>./run_offline_tests.sh<br><img src="http://ovnsp3bhk.bkt.clouddn.com/17.png" alt=""><br>证明安装成功。<br>在三个组件中新建localsettings.py文件并设置kafka，redis，zookeeper的相关配置以确保通信</p>
+<pre><code>cd kafka-monitor/
+vim localsettings.py
+REDIS_HOST = &apos;127.0.0.1&apos;
+KAFKA_HOSTS = &apos;127.0.0.1:9092,127.0.0.2:9092,127.0.0.3:9092&apos;
+</code></pre><p>配置好后分别测试集群<br><img src="http://ovnsp3bhk.bkt.clouddn.com/18.png" alt=""><br><img src="http://ovnsp3bhk.bkt.clouddn.com/19.png" alt=""></p>
 <h2 id="scrapy-cluster集群工作"><a href="#scrapy-cluster集群工作" class="headerlink" title="scrapy-cluster集群工作"></a>scrapy-cluster集群工作</h2><p>1.启动每台机器的kafka，zookeeper，redis.<br>2.python kafka_monitor.py run<br>3.scrapy runspider crawling/spiders/link_spider.py<br>4.python kafkadump.py dump -t demo.crawled_firehose<br>5.python kafkadump.py dump -t demo.outbound_firehose<br>6.python redis_monitor.py</p>
-<p>需要并行执行这些脚本，建议多窗口运行，比如利用tmux开启新窗口。<br>python kafka_monitor.py run<br><img src="http://ovnsp3bhk.bkt.clouddn.com/20.png" alt=""><br>yum isntall tmux<br>tmux new -s python_kafka_run<br>tmux ls：<br><img src="http://ovnsp3bhk.bkt.clouddn.com/21.png" alt=""><br>查看当前所有topic：<br><img src="http://ovnsp3bhk.bkt.clouddn.com/22.png" alt=""><br>进行url爬虫：<br>这里需要多看scrapy-cluster api文档<a href="http://scrapy-cluster.readthedocs.io/en/latest/topics/kafka-monitor/api.html#crawl-api" target="_blank" rel="external">http://scrapy-cluster.readthedocs.io/en/latest/topics/kafka-monitor/api.html#crawl-api</a>.<br>假设当前需要爬取网址：php0.net<br>    [root@172 kafka-monitor]# python kafka_monitor.py feed ‘{“url”: “<a href="http://php0.net/" target="_blank" rel="external">http://php0.net/</a>“, “appid”:”php0appid3”, “crawlid”:”php0crawlid3”, “maxdepth”:3, “allowed_domains”:[“php0.net”]}’<br>    2018-01-10 17:40:10,678 [kafka-monitor] INFO: Feeding JSON into demo.incoming<br>    {<br>    “url”: “<a href="http://php0.net/" target="_blank" rel="external">http://php0.net/</a>“,<br>    “maxdepth”: 3,<br>    “allowed_domains”: [<br>    “php0.net”<br>    ],<br>    “crawlid”: “php0crawlid3”,<br>    “appid”: “php0appid3”<br>    }<br>    2018-01-10 17:40:10,690 [kafka-monitor] INFO: Successfully fed item to Kafka<br>随后我们启动dump监听redis返回的结果：<br><img src="http://ovnsp3bhk.bkt.clouddn.com/23.png" alt=""><br>可以时时监听到完整的json数据，格式如下：<br>    { “body”: “<body string="" omitted="">“, “crawlid”: “ABC123”, “response_url”: “<a href="http://istresearch.com" target="_blank" rel="external">http://istresearch.com</a>“, “url”: “<a href="http://istresearch.com" target="_blank" rel="external">http://istresearch.com</a>“, “status_code”: 200, “status_msg”: “OK”, “appid”: “testapp”, “links”: [], “request_headers”: { “Accept-Language”: “en”, “Accept-Encoding”: “gzip,deflate”, “Accept”: “text/html,application/xhtml+xml,application/xml;q=0.9,<em>/</em>;q=0.8”, “User-Agent”: “Scrapy/1.0.3 (+<a href="http://scrapy.org" target="_blank" rel="external">http://scrapy.org</a>)” }, “attrs”: null, “timestamp”: “2016-01-05T20:14:54.653703” }<br>利用python脚本获取爬取到的url数据，吐到mongodb里，因为这里我们不需要body数据，只需要url数据和其对应的扫描id，我们在127.0.0.3中安装mongodb，由于网络限制将其27017端口改成443，内网办公网段方可访问。<br>kafka_data_tomongo.py:<br>    from pykafka import KafkaClient<br>    from scapy.all import *<br>    import time<br>    import logging<br>    from pymongo import MongoClient</body></p>
-<pre><code>logging.getLogger(&quot;pykafka&quot;).addHandler(logging.StreamHandler())
+<p>需要并行执行这些脚本，建议多窗口运行，比如利用tmux开启新窗口。<br>python kafka_monitor.py run<br><img src="http://ovnsp3bhk.bkt.clouddn.com/20.png" alt=""><br>yum isntall tmux<br>tmux new -s python_kafka_run<br>tmux ls：<br><img src="http://ovnsp3bhk.bkt.clouddn.com/21.png" alt=""><br>查看当前所有topic：<br><img src="http://ovnsp3bhk.bkt.clouddn.com/22.png" alt=""><br>进行url爬虫：<br>这里需要多看scrapy-cluster api文档<a href="http://scrapy-cluster.readthedocs.io/en/latest/topics/kafka-monitor/api.html#crawl-api" target="_blank" rel="external">http://scrapy-cluster.readthedocs.io/en/latest/topics/kafka-monitor/api.html#crawl-api</a>.<br>假设当前需要爬取网址：php0.net</p>
+<pre><code>[root@172 kafka-monitor]# python kafka_monitor.py feed &apos;{&quot;url&quot;: &quot;http://php0.net/&quot;, &quot;appid&quot;:&quot;php0appid3&quot;, &quot;crawlid&quot;:&quot;php0crawlid3&quot;, &quot;maxdepth&quot;:3, &quot;allowed_domains&quot;:[&quot;php0.net&quot;]}&apos;
+2018-01-10 17:40:10,678 [kafka-monitor] INFO: Feeding JSON into demo.incoming
+{
+&quot;url&quot;: &quot;http://php0.net/&quot;, 
+&quot;maxdepth&quot;: 3, 
+&quot;allowed_domains&quot;: [
+&quot;php0.net&quot;
+], 
+&quot;crawlid&quot;: &quot;php0crawlid3&quot;, 
+&quot;appid&quot;: &quot;php0appid3&quot;
+}
+2018-01-10 17:40:10,690 [kafka-monitor] INFO: Successfully fed item to Kafka
+</code></pre><p>随后我们启动dump监听redis返回的结果：<br><img src="http://ovnsp3bhk.bkt.clouddn.com/23.png" alt=""><br>可以时时监听到完整的json数据，格式如下：</p>
+<pre><code>{ &quot;body&quot;: &quot;&lt;body string omitted&gt;&quot;, &quot;crawlid&quot;: &quot;ABC123&quot;, &quot;response_url&quot;: &quot;http://istresearch.com&quot;, &quot;url&quot;: &quot;http://istresearch.com&quot;, &quot;status_code&quot;: 200, &quot;status_msg&quot;: &quot;OK&quot;, &quot;appid&quot;: &quot;testapp&quot;, &quot;links&quot;: [], &quot;request_headers&quot;: { &quot;Accept-Language&quot;: &quot;en&quot;, &quot;Accept-Encoding&quot;: &quot;gzip,deflate&quot;, &quot;Accept&quot;: &quot;text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&quot;, &quot;User-Agent&quot;: &quot;Scrapy/1.0.3 (+http://scrapy.org)&quot; }, &quot;attrs&quot;: null, &quot;timestamp&quot;: &quot;2016-01-05T20:14:54.653703&quot; }
+</code></pre><p>利用python脚本获取爬取到的url数据，吐到mongodb里，因为这里我们不需要body数据，只需要url数据和其对应的扫描id，我们在127.0.0.3中安装mongodb，由于网络限制将其27017端口改成443，内网办公网段方可访问。<br>kafka_data_tomongo.py:</p>
+<pre><code>from pykafka import KafkaClient
+from scapy.all import *
+import time
+import logging
+from pymongo import MongoClient
+
+logging.getLogger(&quot;pykafka&quot;).addHandler(logging.StreamHandler())
 logging.getLogger(&quot;pykafka&quot;).setLevel(logging.DEBUG)
 
 sys_config = {
@@ -112,7 +162,22 @@ def UrlClean(urls,url):
     else:
         print url
         return 0
-</code></pre><h2 id="Http服务器搭建"><a href="#Http服务器搭建" class="headerlink" title="Http服务器搭建"></a>Http服务器搭建</h2><p>Http服务器直接使用了Flask框架，提供Reastful API以供其他调用。代码非常简单，如下：<br>    @app.route(‘/scrapyresult’)<br>    def scrapy_url():<br>        appid = request.args.get(‘appid’, None)<br>        condition = {}<br>        if appid and appid != ‘’:<br>            condition[‘appid’] = appid<br>        model = db_connect.urls.find(condition,{“<em>id”:0})<br>        data = []<br>        for </em> in model:<br>            data.append(_)<br>        totalcount = model.count()<br>        if data:<br>            return ajaxReturn(data, totalcount,’get result success’, 1,)<br>        else:<br>            return ajaxReturn(None,totalcount, “result is null”, -1)</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文的架构还有优化的思路，可以在kafka到redis，redis到mongodb的数据流转中优化性能。</p>
+</code></pre><h2 id="Http服务器搭建"><a href="#Http服务器搭建" class="headerlink" title="Http服务器搭建"></a>Http服务器搭建</h2><p>Http服务器直接使用了Flask框架，提供Reastful API以供其他调用。代码非常简单，如下：</p>
+<pre><code>@app.route(&apos;/scrapyresult&apos;)
+def scrapy_url():
+    appid = request.args.get(&apos;appid&apos;, None)
+    condition = {}
+    if appid and appid != &apos;&apos;:
+        condition[&apos;appid&apos;] = appid
+    model = db_connect.urls.find(condition,{&quot;_id&quot;:0})
+    data = []
+    for _ in model:
+        data.append(_)
+    totalcount = model.count()
+    if data:
+        return ajaxReturn(data, totalcount,&apos;get result success&apos;, 1,)
+    else:
+        return ajaxReturn(None,totalcount, &quot;result is null&quot;, -1)
+</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文的架构还有优化的思路，可以在kafka到redis，redis到mongodb的数据流转中优化性能。</p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://gitee.com/lujunjian/UrlClean" target="_blank" rel="external">https://gitee.com/lujunjian/UrlClean</a><br><a href="http://blog.csdn.net/Tilyp/article/details/56298954" target="_blank" rel="external">http://blog.csdn.net/Tilyp/article/details/56298954</a><br><a href="https://scrapy-cluster.readthedocs.io/en/latest/" target="_blank" rel="external">https://scrapy-cluster.readthedocs.io/en/latest/</a><br>多谢Dean、Mr hao、Tanglion</p>
 </div></article></div></main><footer><div class="paginator"><a href="/2017/11/07/集群监控之golang-socket双向通信/" class="next">NEXT</a></div><div class="copyright"><p>© 2015 - 2018 <a href="http://yoursite.com">Bipabo1l</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>
