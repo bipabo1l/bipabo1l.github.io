@@ -162,6 +162,139 @@ def UrlClean(urls,url):
     else:
         print url
         return 0
+</code></pre><h2 id="最终脚本"><a href="#最终脚本" class="headerlink" title="最终脚本"></a>最终脚本</h2><p>最终脚本如下：</p>
+<pre><code># coding=utf-8
+import hashlib
+import redis
+import urlparse
+import time
+import re
+from pykafka import KafkaClient
+from scapy.all import *
+import time
+import logging
+from pymongo import MongoClient
+import webEye
+
+logging.getLogger(&quot;pykafka&quot;).addHandler(logging.StreamHandler())
+logging.getLogger(&quot;pykafka&quot;).setLevel(logging.DEBUG)
+
+URL_KEY = &quot;urls&quot;
+URL_HASH_KEY = &quot;url_hash_key&quot;
+SIM_RULE_KEY = &quot;sim_rule_key&quot;
+client_redis = redis.Redis(host=&apos;127.0.0.1&apos;,port=6379,db=8)
+
+del_key_list = [&quot;_&quot;]
+
+sys_config = {
+    &quot;database&quot;: {
+        &quot;db_name&quot;: &quot;url_pool&quot;,
+        &quot;db_host&quot;: &quot;mongodb://172.20.214.71:443/&quot;
+    }
+}
+
+client_mongo = MongoClient(sys_config[&apos;database&apos;][&apos;db_host&apos;])
+db_connect = client_mongo[sys_config[&apos;database&apos;][&apos;db_name&apos;]]
+
+client = KafkaClient(zookeeper_hosts =&quot;172.20.214.66:2181,172.20.214.69:2181,172.20.214.71:2181&quot;)
+topic = client.topics[&apos;demo.crawled_firehose&apos;]
+
+def md5(strs):
+    m1 = hashlib.md5()
+    m1.update(strs)
+    return m1.hexdigest()
+
+def UrlSortAndCleanKey(url_str):
+    new_url = url_str
+    url1 = urlparse.urlsplit(url_str)
+    key_list = {}
+    key_list2 = []
+    value_list = []
+    l = url1.query.split(&quot;&amp;&quot;)
+    for k in l:
+        kk = k.split(&quot;=&quot;)
+        if len(kk) &gt; 1:
+            key_list[kk[0]] = kk[1]
+            value_list.append(kk[1])
+    for p in key_list:
+        if p not in del_key_list:
+            key_list2.append(p)
+    key_query_str = &quot;&quot;
+    for pp in sorted(key_list.keys()):
+        key_query_str += &quot;&amp;&quot; + pp + &quot;=&quot; + key_list[pp]
+    if url1.fragment != &quot;&quot;:
+        key_query_str += &quot;#&quot; + url1.fragment
+    query_str = &quot;&quot;
+    if key_query_str != &quot;&quot;:
+        query_str = &quot;?&quot; + key_query_str[1:]
+    new_url = url1.scheme + &apos;://&apos; + url1.netloc + url1.path + query_str
+    return new_url
+
+def SimRepeatRemove(url_str):
+    is_exists = False
+    rex_symbol_list = [&quot;$&quot;, &quot;(&quot;, &quot;)&quot;, &quot;*&quot;, &quot;+&quot;, &quot;.&quot;, &quot;[&quot;, &quot;]&quot;, &quot;?&quot;, &quot;\\&quot;, &quot;^&quot;, &quot;{&quot;, &quot;}&quot;, &quot;|&quot;, &quot;/&quot;]
+    result = client_redis.lrange(SIM_RULE_KEY,0,-1)
+    for p in result:
+        matchObj = re.search(p,url_str, re.M|re.I)
+        if matchObj:
+            is_exists = True
+            break
+    if is_exists == False:
+        for rex in rex_symbol_list:
+            url_str = url_str.replace(rex,&apos;\\&apos; + rex)
+            url_str = url_str.replace(r&apos;\\&apos;,&apos;\\&apos;)
+        url_str = &apos;^&apos; + url_str + &apos;$&apos;
+        rule = re.sub(&apos;\d+&apos;,&apos;(\d+)&apos; , url_str, count=0, flags=0)
+        client_redis.lrem(SIM_RULE_KEY,rule,num=0)
+        client_redis.lpush(SIM_RULE_KEY,rule)
+    return is_exists
+
+
+def UrlClean(urls,url):
+    t = int(time.time())
+    url = UrlSortAndCleanKey(url)
+    url_hash = md5(url)
+    is_exists = client_redis.hexists(URL_HASH_KEY,url_hash)
+    if is_exists == False:
+        if SimRepeatRemove(url) == False:
+            client_redis.hset(URL_HASH_KEY,url_hash,t)
+            client_redis.lpush(URL_KEY,url)
+            return 1
+        else:
+            #print url
+            return -1
+    else:
+        print url
+        return 0
+
+if __name__==&quot;__main__&quot;:  
+    consumer = topic.get_balanced_consumer(consumer_group=&apos;test_group&apos;,auto_commit_enable=True) 
+    regex = &apos;response_url\&quot;: \&quot;(.*?)\&quot;,&apos;
+    regex2 = &apos;appid\&quot;: \&quot;(.*?)\&quot;}&apos;
+    domain_list = []
+    url = &quot;&quot;
+    appid = &quot;&quot;
+    for message in consumer:
+        print message.value
+        for m in re.findall(regex, message.value):
+            url = m
+            domain_list.append(url)
+            break
+        for k in re.findall(regex2, message.value):
+            appid = k
+            break
+        urls_list = db_connect.urls.find({&quot;appid&quot;: appid}).distinct(&apos;url&apos;)
+        webEye_res = webEye.WebEye(url)
+        webEye_res.run()
+        webEye_info = list(webEye_res.cms_list)
+        if UrlClean(urls_list,url) != -1:
+            #去重后的url库
+            try:
+                db_connect.urls.save({&quot;url&quot;: url, &quot;appid&quot;: appid, &quot;fingerprint&quot;:webEye_info})
+                print &quot;mongodb insert success&quot;
+            except ValueError, e:
+                print &quot;mongodb insert Error&quot;
+        print &quot;----------------------------------------------------------------------------------------------&quot;
 </code></pre><h2 id="Http服务器搭建"><a href="#Http服务器搭建" class="headerlink" title="Http服务器搭建"></a>Http服务器搭建</h2><p>Http服务器直接使用了Flask框架，提供Reastful API以供其他调用。代码非常简单，如下：</p>
 <pre><code>@app.route(&apos;/scrapyresult&apos;)
 def scrapy_url():
@@ -180,4 +313,4 @@ def scrapy_url():
         return ajaxReturn(None,totalcount, &quot;result is null&quot;, -1)
 </code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文的架构还有优化的思路，可以在kafka到redis，redis到mongodb的数据流转中优化性能。</p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://gitee.com/lujunjian/UrlClean" target="_blank" rel="external">https://gitee.com/lujunjian/UrlClean</a><br><a href="http://blog.csdn.net/Tilyp/article/details/56298954" target="_blank" rel="external">http://blog.csdn.net/Tilyp/article/details/56298954</a><br><a href="https://scrapy-cluster.readthedocs.io/en/latest/" target="_blank" rel="external">https://scrapy-cluster.readthedocs.io/en/latest/</a><br>多谢Dean、Mr hao、Tanglion</p>
-</div></article></div></main><footer><div class="paginator"><a href="/2017/11/07/集群监控之golang-socket双向通信/" class="next">NEXT</a></div><div class="copyright"><p>© 2015 - 2018 <a href="http://yoursite.com">Bipabo1l</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>
+</div></article></div></main><footer><div class="paginator"><a href="/2017/11/07/集群监控之golang-socket双向通信/" class="next">下一篇</a></div><div class="copyright"><p>© 2015 - 2018 <a href="http://yoursite.com">Bipabo1l</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>
