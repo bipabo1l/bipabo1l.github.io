@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>浅析Android中ZipEntry漏洞 - BIPABO1L&#39;s BLog</title>
+  <meta property="og:title" content="浅析Android中ZipEntry漏洞 - BIPABO1L&#39;s BLog" />
+  <meta name="twitter:title" content="浅析Android中ZipEntry漏洞 - BIPABO1L&#39;s BLog" />
+  <meta name="description" content="介绍 在Android APK加载时，通常情况下会请求各种资源，这其中就包括请求本地或者外部服务器的压缩文件。而由于zip格式压缩文件允许”../“的字符串，攻击者可以在APK加载时对应用本来想加载的文件进行“调虎离山”，将自己利用多个”../“生成的压缩文件替换原文件，这种情况下如果APK对这个zip文件解析不当，那么轻则导致文件覆盖，重则导致本地拒绝服务，甚至代码执行。
+漏洞原理 这里以一个Apk为例说明，下图中，我反编译了一个APK，获取到了dex文件，利用dex2jar转换成了java中的jar文件并利用Java Decomplier进行读取。 定位到存在ZipEntry漏洞的地方，如下图所示：
+可以发现代码的逻辑时调用zipEntry类中的getName()方法，获取到解压到的Zip文件中的自文件名称，但是并未进行任何的../过滤，从而允许了攻击者构造../的zip包进行攻击的可能，攻击者可以构造精心构造的zip包，在root过的手机中抓包，对包含zip的调用包进行篡改，将原zip包篡改成本地构造后的zip包，随后在本地查看文件管理器，可以发现攻击者指定的目录下的文件。 构造特定的zip包代码如下：（使用java编写）
+执行后在zippoc根目录下可发现新生成的test.zip文件
+上传包中篡改该文件即可。 修复方案为在上传包中对文件名进行严格的校验，过滤”../“
+#后记 该漏洞为移动安全漏洞中的低危或中危漏洞，其实不是很好利用，利用方式略微鸡肋但是影响却不小，但很多厂商并未对其进行过多的校验。笔者就发现了滴滴代驾司机客户端、斗鱼Android客户端、Wifi万能钥匙客户端等等均存在此漏洞并进行了报告。
+该漏洞如果结合了其他漏洞也会产生较为严重的影响，希望厂商予以重视。">
+  <meta property="og:description" content="介绍 在Android APK加载时，通常情况下会请求各种资源，这其中就包括请求本地或者外部服务器的压缩文件。而由于zip格式压缩文件允许”../“的字符串，攻击者可以在APK加载时对应用本来想加载的文件进行“调虎离山”，将自己利用多个”../“生成的压缩文件替换原文件，这种情况下如果APK对这个zip文件解析不当，那么轻则导致文件覆盖，重则导致本地拒绝服务，甚至代码执行。
+漏洞原理 这里以一个Apk为例说明，下图中，我反编译了一个APK，获取到了dex文件，利用dex2jar转换成了java中的jar文件并利用Java Decomplier进行读取。 定位到存在ZipEntry漏洞的地方，如下图所示：
+可以发现代码的逻辑时调用zipEntry类中的getName()方法，获取到解压到的Zip文件中的自文件名称，但是并未进行任何的../过滤，从而允许了攻击者构造../的zip包进行攻击的可能，攻击者可以构造精心构造的zip包，在root过的手机中抓包，对包含zip的调用包进行篡改，将原zip包篡改成本地构造后的zip包，随后在本地查看文件管理器，可以发现攻击者指定的目录下的文件。 构造特定的zip包代码如下：（使用java编写）
+执行后在zippoc根目录下可发现新生成的test.zip文件
+上传包中篡改该文件即可。 修复方案为在上传包中对文件名进行严格的校验，过滤”../“
+#后记 该漏洞为移动安全漏洞中的低危或中危漏洞，其实不是很好利用，利用方式略微鸡肋但是影响却不小，但很多厂商并未对其进行过多的校验。笔者就发现了滴滴代驾司机客户端、斗鱼Android客户端、Wifi万能钥匙客户端等等均存在此漏洞并进行了报告。
+该漏洞如果结合了其他漏洞也会产生较为严重的影响，希望厂商予以重视。">
+  <meta name="twitter:description" content="介绍 在Android APK加载时，通常情况下会请求各种资源，这其中就包括请求本地或者外部服务器的压缩文件。而由于zip格式压缩文件允许”../“的字符串，攻击者可以在APK加载时对应用本来想加载的文件进行“调虎离山”，将自己利用多个”../“生成的压缩文件替换原文件，这种情况下如果APK对这个zip文件解析不当，那么轻则导致文件覆盖，重则导致本地拒绝服务，甚至代码执行。
+漏洞原理 这里以一 …">
+  <meta name="author" content=""/>
+  <meta property="og:site_name" content="BIPABO1L&#39;s BLog" />
+  <meta property="og:url" content="http://bipabo1l.github.io/post/%E6%B5%85%E6%9E%90android%E4%B8%ADzipentry%E6%BC%8F%E6%B4%9E/" />
+  <meta property="og:type" content="article" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="generator" content="Hugo 0.53" />
+
+  <link rel="stylesheet" href="/css/style.css" media="all" />
+  <link rel="stylesheet" href="/css/syntax.css" media="all" />
+  <link rel="stylesheet" href="/css/custom.css" media="all" />
+
+  <script src="/js/script.js"></script>
+  <script src="/js/custom.js"></script>
+  <script defer src="/js/fontawesome.js"></script>
+</head>
+
+<body>
+
+<header class="site-header">
+  <nav class="site-navi">
+    <h1 class="site-title"><a href="/">BIPABO1L&#39;s BLog</a></h1>
+    <ul class="site-navi-items">
+
+       <li class="site-navi-item-plan"><a href="/posts/plan/" title="plan">Plan</a></li>
+    </ul>
+  </nav>
+</header>
+<hr class="site-header-bottom">
+
+  <div class="main" role="main">
+    <article class="article">
+      
+      
+      <h1 class="article-title">浅析Android中ZipEntry漏洞</h1>
+      
+      <hr class="article-title-bottom">
+      <ul class="article-meta">
+        <li class="article-meta-date"><time>December 25, 2018</time></li>
+      </ul>
+      
+
+      
+
+<h1 id="介绍">介绍</h1>
+
+<p>在Android APK加载时，通常情况下会请求各种资源，这其中就包括请求本地或者外部服务器的压缩文件。而由于zip格式压缩文件允许”../“的字符串，攻击者可以在APK加载时对应用本来想加载的文件进行“调虎离山”，将自己利用多个”../“生成的压缩文件替换原文件，这种情况下如果APK对这个zip文件解析不当，那么轻则导致文件覆盖，重则导致本地拒绝服务，甚至代码执行。</p>
+
+<h1 id="漏洞原理">漏洞原理</h1>
+
+<p>这里以一个Apk为例说明，下图中，我反编译了一个APK，获取到了dex文件，利用dex2jar转换成了java中的jar文件并利用Java Decomplier进行读取。
+定位到存在ZipEntry漏洞的地方，如下图所示：</p>
+
+<p>可以发现代码的逻辑时调用zipEntry类中的getName()方法，获取到解压到的Zip文件中的自文件名称，但是并未进行任何的../过滤，从而允许了攻击者构造../的zip包进行攻击的可能，攻击者可以构造精心构造的zip包，在root过的手机中抓包，对包含zip的调用包进行篡改，将原zip包篡改成本地构造后的zip包，随后在本地查看文件管理器，可以发现攻击者指定的目录下的文件。
+构造特定的zip包代码如下：（使用java编写）</p>
+
+<p>执行后在zippoc根目录下可发现新生成的test.zip文件</p>
+
+<p>上传包中篡改该文件即可。
+修复方案为在上传包中对文件名进行严格的校验，过滤”../“</p>
+
+<p>#后记
+该漏洞为移动安全漏洞中的低危或中危漏洞，其实不是很好利用，利用方式略微鸡肋但是影响却不小，但很多厂商并未对其进行过多的校验。笔者就发现了滴滴代驾司机客户端、斗鱼Android客户端、Wifi万能钥匙客户端等等均存在此漏洞并进行了报告。</p>
+
+<p>该漏洞如果结合了其他漏洞也会产生较为严重的影响，希望厂商予以重视。</p>
+
+    </article>
+
+
+
+
+    <ul class="pager article-pager">
+      <li class="pager-newer pager-noitem">&lt; Newer</li>
+      <li class="pager-older pager-noitem">Older &gt;</li>
+    </ul>
+
+          <div id="gitalk-container"></div>
+  <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+  <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+  <script>
+var gitalk = new Gitalk({
+  clientID: '2f61b9423ddfde01f318',
+  clientSecret: 'ae6360004775eb79f1069c0ea047f2fcd0f8cfc7',
+  repo: 'dean2021.github.io',
+  owner: 'dean2021',
+  admin: ['dean2021'],
+  id: location.pathname,      
+  distractionFreeMode: false  
+})
+
+gitalk.render('gitalk-container')
+  </script>
+
+
+
+  </div>
+
+
+<div class="site-footer">
+  <div class="copyright"></div>
+  <ul class="site-footer-items">
+  </ul>
+  <div class="powerdby">
+    Powered by <a href="https://gohugo.io/">Hugo</a>  and Dean
+  </div>
+</div>
+
+
+</body>
+</html>

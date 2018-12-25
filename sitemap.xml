@@ -3,12 +3,24 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://bipabo1l.github.io/post/%E6%B5%85%E6%9E%90android%E4%B8%ADzipentry%E6%BC%8F%E6%B4%9E/</loc>
+    <lastmod>2018-12-25T17:23:29+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://bipabo1l.github.io/</loc>
+    <lastmod>2018-12-25T17:23:29+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://bipabo1l.github.io/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://bipabo1l.github.io/post/</loc>
+    <lastmod>2018-12-25T17:23:29+08:00</lastmod>
     <priority>0</priority>
   </url>
   
