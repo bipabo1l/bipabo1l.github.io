@@ -40,6 +40,28 @@
   <div class="main" role="main">
     <section class="list home-list">
       <article class="article">
+        <a href="/post/%E8%AE%B0%E4%B8%80%E6%AC%A1golang_post_xml%E6%97%B6%E8%BF%94%E5%9B%9E502%E9%94%99%E8%AF%AF%E7%A0%81%E7%9A%84%E9%97%AE%E9%A2%98/" class="article-titles">
+          <h2 class="article-title">记一次golang</h2>
+          
+        </a>
+        <ul class="article-meta">
+          <li class="article-meta-date"><time>December 25, 2018</time></li>
+        </ul>
+        <div class="article-content">
+          详情 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。
+Python代码如下：
+coding=utf-8 import requests import cgi
+def send(phone, msg): url = &lsquo;http://xxx.com/MoblMsgSender' headers = { &lsquo;Host&rsquo;: &lsquo;xxx.com&rsquo;, } body = &lsquo;&lt;?xml version=&ldquo;1.0&rdquo; ?&gt;Tokenxxx==/S:Header%s%syunwei.alarm/ns2:xxMmSender/S:Body/S:Envelope&rsquo; % (phone, cgi.escape(msg)) try: r = requests.post(url, data=body, headers=headers) if &lsquo;true&rsquo; in r.content: return True except: pass return False
+send(&ldquo;135xxxxxxx&rdquo;,&ldquo;testPython&rdquo;) 果然成功收到了短信，证明接口调用成功。
+于是我转化成golang代码：
+package main
+import ( &ldquo;bytes&rdquo; &ldquo;crypto/tls&rdquo; &ldquo;log&rdquo; &ldquo;net/http&rdquo; &ldquo;strings&rdquo; &ldquo;time&rdquo; )
+func sendmessage(phone string, msg string) error { uri := http://xxx.com/MoblMsgSender //proxy, _ := url.
+        </div>
+        <div class="article-readmore"><a href="/post/%E8%AE%B0%E4%B8%80%E6%AC%A1golang_post_xml%E6%97%B6%E8%BF%94%E5%9B%9E502%E9%94%99%E8%AF%AF%E7%A0%81%E7%9A%84%E9%97%AE%E9%A2%98/">Read more...</a></div>
+        <div class="article-floatclear"></div>
+      </article>
+      <article class="article">
         <a href="/post/%E6%B5%85%E6%9E%90android%E4%B8%ADzipentry%E6%BC%8F%E6%B4%9E/" class="article-titles">
           <h2 class="article-title">浅析Android中ZipEntry漏洞</h2>
           
