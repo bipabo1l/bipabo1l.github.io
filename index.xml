@@ -7,10 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>&amp;copy; Copyright 2018 bipabo1l</copyright>
-    <lastBuildDate>Tue, 25 Dec 2018 17:50:01 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 25 Dec 2018 20:45:37 +0800</lastBuildDate>
     
 	<atom:link href="http://bipabo1l.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>About</title>
+      <link>http://bipabo1l.github.io/about/about/</link>
+      <pubDate>Tue, 25 Dec 2018 20:45:37 +0800</pubDate>
+      
+      <guid>http://bipabo1l.github.io/about/about/</guid>
+      <description>安全工程师一枚
+主攻 安全研发、安全测试、安全研究
+喜欢篮球、旅行、美食</description>
+    </item>
     
     <item>
       <title>记一次golang</title>

@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://bipabo1l.github.io/about/about/</loc>
+    <lastmod>2018-12-25T20:45:37+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://bipabo1l.github.io/post/%E8%AE%B0%E4%B8%80%E6%AC%A1golang_post_xml%E6%97%B6%E8%BF%94%E5%9B%9E502%E9%94%99%E8%AF%AF%E7%A0%81%E7%9A%84%E9%97%AE%E9%A2%98/</loc>
     <lastmod>2018-12-25T17:50:01+08:00</lastmod>
   </url>
@@ -13,8 +18,14 @@
   </url>
   
   <url>
+    <loc>http://bipabo1l.github.io/about/</loc>
+    <lastmod>2018-12-25T20:45:37+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>http://bipabo1l.github.io/</loc>
-    <lastmod>2018-12-25T17:50:01+08:00</lastmod>
+    <lastmod>2018-12-25T20:45:37+08:00</lastmod>
     <priority>0</priority>
   </url>
   
