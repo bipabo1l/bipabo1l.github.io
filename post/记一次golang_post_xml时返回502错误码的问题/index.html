@@ -8,26 +8,17 @@
   <meta name="twitter:title" content="记一次golang - BIPABO1L&#39;s BLog" />
   <meta name="description" content="详情 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。
 Python代码如下：
-coding=utf-8 import requests import cgi
-def send(phone, msg): url = &lsquo;http://xxx.com/MoblMsgSender&#39; headers = { &lsquo;Host&rsquo;: &lsquo;xxx.com&rsquo;, } body = &lsquo;&lt;?xml version=&ldquo;1.0&rdquo; ?&gt;Tokenxxx==/S:Header%s%syunwei.alarm/ns2:xxMmSender/S:Body/S:Envelope&rsquo; % (phone, cgi.escape(msg)) try: r = requests.post(url, data=body, headers=headers) if &lsquo;true&rsquo; in r.content: return True except: pass return False
-send(&ldquo;135xxxxxxx&rdquo;,&ldquo;testPython&rdquo;) 果然成功收到了短信，证明接口调用成功。
+# coding=utf-8 import requests import cgi def send(phone, msg): url = &#39;http://xxx.com/MoblMsgSender&#39; headers = { &#39;Host&#39;: &#39;xxx.com&#39;, } body = &#39;&lt;?xml version=&quot;1.0&quot; ?&gt;&lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&lt;S:Header&gt;&lt;AuthenticationHeader xmlns=&quot;http://xxx.com/MoblMsgSender&quot;&gt;&lt;Token&gt;Tokenxxx==&lt;/Token&gt;&lt;/AuthenticationHeader&gt;&lt;/S:Header&gt;&lt;S:Body&gt;&lt;ns2:xxMmSender xmlns:ns2=&quot;http://xxx.com/&quot;&gt;&lt;arg0 xmlns=&quot;&quot;&gt;%s&lt;/arg0&gt;&lt;arg1 xmlns=&quot;&quot;&gt;%s&lt;/arg1&gt;&lt;arg2 xmlns=&quot;&quot;&gt;yunwei.alarm&lt;/arg2&gt;&lt;arg3 xmlns=&quot;&quot;&gt;&lt;/arg3&gt;&lt;/ns2:xxMmSender&gt;&lt;/S:Body&gt;&lt;/S:Envelope&gt;&#39; % (phone, cgi.escape(msg)) try: r = requests.post(url, data=body, headers=headers) if &#39;&lt;return&gt;true&lt;/return&gt;&#39; in r.content: return True except: pass return False send(&quot;135xxxxxxx&quot;,&quot;testPython&quot;)  果然成功收到了短信，证明接口调用成功。
 于是我转化成golang代码：
-package main
-import ( &ldquo;bytes&rdquo; &ldquo;crypto/tls&rdquo; &ldquo;log&rdquo; &ldquo;net/http&rdquo; &ldquo;strings&rdquo; &ldquo;time&rdquo; )
-func sendmessage(phone string, msg string) error { uri := http://xxx.com/MoblMsgSender //proxy, _ := url.">
+package main import ( &quot;bytes&quot; &quot;crypto/tls&quot; &quot;log&quot; &quot;net/http&quot; &quot;strings&quot; &quot;time&quot; ) func sendmessage(phone string, msg string) error { uri := `http://xxx.">
   <meta property="og:description" content="详情 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。
 Python代码如下：
-coding=utf-8 import requests import cgi
-def send(phone, msg): url = &lsquo;http://xxx.com/MoblMsgSender&#39; headers = { &lsquo;Host&rsquo;: &lsquo;xxx.com&rsquo;, } body = &lsquo;&lt;?xml version=&ldquo;1.0&rdquo; ?&gt;Tokenxxx==/S:Header%s%syunwei.alarm/ns2:xxMmSender/S:Body/S:Envelope&rsquo; % (phone, cgi.escape(msg)) try: r = requests.post(url, data=body, headers=headers) if &lsquo;true&rsquo; in r.content: return True except: pass return False
-send(&ldquo;135xxxxxxx&rdquo;,&ldquo;testPython&rdquo;) 果然成功收到了短信，证明接口调用成功。
+# coding=utf-8 import requests import cgi def send(phone, msg): url = &#39;http://xxx.com/MoblMsgSender&#39; headers = { &#39;Host&#39;: &#39;xxx.com&#39;, } body = &#39;&lt;?xml version=&quot;1.0&quot; ?&gt;&lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&lt;S:Header&gt;&lt;AuthenticationHeader xmlns=&quot;http://xxx.com/MoblMsgSender&quot;&gt;&lt;Token&gt;Tokenxxx==&lt;/Token&gt;&lt;/AuthenticationHeader&gt;&lt;/S:Header&gt;&lt;S:Body&gt;&lt;ns2:xxMmSender xmlns:ns2=&quot;http://xxx.com/&quot;&gt;&lt;arg0 xmlns=&quot;&quot;&gt;%s&lt;/arg0&gt;&lt;arg1 xmlns=&quot;&quot;&gt;%s&lt;/arg1&gt;&lt;arg2 xmlns=&quot;&quot;&gt;yunwei.alarm&lt;/arg2&gt;&lt;arg3 xmlns=&quot;&quot;&gt;&lt;/arg3&gt;&lt;/ns2:xxMmSender&gt;&lt;/S:Body&gt;&lt;/S:Envelope&gt;&#39; % (phone, cgi.escape(msg)) try: r = requests.post(url, data=body, headers=headers) if &#39;&lt;return&gt;true&lt;/return&gt;&#39; in r.content: return True except: pass return False send(&quot;135xxxxxxx&quot;,&quot;testPython&quot;)  果然成功收到了短信，证明接口调用成功。
 于是我转化成golang代码：
-package main
-import ( &ldquo;bytes&rdquo; &ldquo;crypto/tls&rdquo; &ldquo;log&rdquo; &ldquo;net/http&rdquo; &ldquo;strings&rdquo; &ldquo;time&rdquo; )
-func sendmessage(phone string, msg string) error { uri := http://xxx.com/MoblMsgSender //proxy, _ := url.">
+package main import ( &quot;bytes&quot; &quot;crypto/tls&quot; &quot;log&quot; &quot;net/http&quot; &quot;strings&quot; &quot;time&quot; ) func sendmessage(phone string, msg string) error { uri := `http://xxx.">
   <meta name="twitter:description" content="详情 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。
 Python代码如下：
-coding=utf-8 import requests import cgi
-def send(phone, msg): url = …">
+# coding=utf-8 import requests import cgi def send(phone, msg): url = …">
   <meta name="author" content=""/>
   <meta property="og:site_name" content="BIPABO1L&#39;s BLog" />
   <meta property="og:url" content="http://bipabo1l.github.io/post/%E8%AE%B0%E4%B8%80%E6%AC%A1golang_post_xml%E6%97%B6%E8%BF%94%E5%9B%9E502%E9%94%99%E8%AF%AF%E7%A0%81%E7%9A%84%E9%97%AE%E9%A2%98/" />
@@ -69,51 +60,51 @@ def send(phone, msg): url = …">
       </ul>
       
 
-      
-
-<p>详情
+      <p>详情
 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。</p>
 
 <p>Python代码如下：</p>
 
-<h1 id="coding-utf-8">coding=utf-8</h1>
+<pre><code># coding=utf-8
 
-<p>import requests
-import cgi</p>
+import requests
+import cgi
 
-<p>def send(phone, msg):
-    url = &lsquo;<a href="http://xxx.com/MoblMsgSender'">http://xxx.com/MoblMsgSender'</a>
+def send(phone, msg):
+    url = 'http://xxx.com/MoblMsgSender'
     headers = {
-        &lsquo;Host&rsquo;: &lsquo;xxx.com&rsquo;,
+        'Host': 'xxx.com',
     }
-    body = &lsquo;&lt;?xml version=&ldquo;1.0&rdquo; ?&gt;<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"><S:Header><AuthenticationHeader xmlns="http://xxx.com/MoblMsgSender"><Token>Tokenxxx==</Token></AuthenticationHeader><a href="/S:Header">/S:Header</a><S:Body><ns2:xxMmSender xmlns:ns2="http://xxx.com/"><arg0 xmlns="">%s</arg0><arg1 xmlns="">%s</arg1><arg2 xmlns="">yunwei.alarm</arg2><arg3 xmlns=""></arg3><a href="/ns2:xxMmSender">/ns2:xxMmSender</a><a href="/S:Body">/S:Body</a><a href="/S:Envelope">/S:Envelope</a>&rsquo; % (phone, cgi.escape(msg))
+    body = '&lt;?xml version=&quot;1.0&quot; ?&gt;&lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&lt;S:Header&gt;&lt;AuthenticationHeader xmlns=&quot;http://xxx.com/MoblMsgSender&quot;&gt;&lt;Token&gt;Tokenxxx==&lt;/Token&gt;&lt;/AuthenticationHeader&gt;&lt;/S:Header&gt;&lt;S:Body&gt;&lt;ns2:xxMmSender xmlns:ns2=&quot;http://xxx.com/&quot;&gt;&lt;arg0 xmlns=&quot;&quot;&gt;%s&lt;/arg0&gt;&lt;arg1 xmlns=&quot;&quot;&gt;%s&lt;/arg1&gt;&lt;arg2 xmlns=&quot;&quot;&gt;yunwei.alarm&lt;/arg2&gt;&lt;arg3 xmlns=&quot;&quot;&gt;&lt;/arg3&gt;&lt;/ns2:xxMmSender&gt;&lt;/S:Body&gt;&lt;/S:Envelope&gt;' % (phone, cgi.escape(msg))
     try:
         r = requests.post(url, data=body, headers=headers)
-        if &lsquo;<return>true</return>&rsquo; in r.content:
+        if '&lt;return&gt;true&lt;/return&gt;' in r.content:
             return True
     except:
         pass
-    return False</p>
+    return False
 
-<p>send(&ldquo;135xxxxxxx&rdquo;,&ldquo;testPython&rdquo;)
-果然成功收到了短信，证明接口调用成功。</p>
+send(&quot;135xxxxxxx&quot;,&quot;testPython&quot;)
+</code></pre>
+
+<p>果然成功收到了短信，证明接口调用成功。</p>
 
 <p>于是我转化成golang代码：</p>
 
-<p>package main</p>
+<pre><code>package main
 
-<p>import (
-    &ldquo;bytes&rdquo;
-    &ldquo;crypto/tls&rdquo;
-    &ldquo;log&rdquo;
-    &ldquo;net/http&rdquo;
-    &ldquo;strings&rdquo;
-    &ldquo;time&rdquo;
-)</p>
+import (
+    &quot;bytes&quot;
+    &quot;crypto/tls&quot;
+    &quot;log&quot;
+    &quot;net/http&quot;
+    &quot;strings&quot;
+    &quot;time&quot;
+)
 
-<p>func sendmessage(phone string, msg string) error {
-    uri := <code>http://xxx.com/MoblMsgSender</code>
-    //proxy, _ := url.Parse(&ldquo;<a href="http://127.0.0.1:8080&quot;">http://127.0.0.1:8080&quot;</a>)
+func sendmessage(phone string, msg string) error {
+    uri := `http://xxx.com/MoblMsgSender`
+    //proxy, _ := url.Parse(&quot;http://127.0.0.1:8080&quot;)
     tr := &amp;http.Transport{
         //Proxy:           http.ProxyURL(proxy),
         TLSClientConfig: &amp;tls.Config{InsecureSkipVerify: true},
@@ -122,14 +113,14 @@ import cgi</p>
         Transport: tr,
         Timeout:   time.Second * 5, //超时时间
     }
-    body := <code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&lt;S:Header&gt;&lt;AuthenticationHeader xmlns=&quot;http://mms.360buy.com/services/MoblMsgSender&quot;&gt;&lt;Token&gt;666a8EN3oIijHY+KjS+2mg==&lt;/Token&gt;&lt;/AuthenticationHeader&gt;&lt;/S:Header&gt;&lt;S:Body&gt;&lt;ns2:xxMmSender xmlns:ns2=&quot;http://xxx.com/&quot;&gt;&lt;arg0 xmlns=&quot;&quot;&gt;</code> + phone + <code>&lt;/arg0&gt;&lt;arg1 xmlns=&quot;&quot;&gt;</code> +     msg + <code>&lt;/arg1&gt;&lt;arg2 xmlns=&quot;&quot;&gt;yunwei.alarm&lt;/arg2&gt;&lt;arg3     xmlns=&quot;&quot;&gt;&lt;/arg3&gt;&lt;/ns2:xxMmSender&gt;&lt;/S:Body&gt;&lt;/    S:Envelope&gt;</code>
+    body := `&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&lt;S:Header&gt;&lt;AuthenticationHeader xmlns=&quot;http://mms.360buy.com/services/MoblMsgSender&quot;&gt;&lt;Token&gt;666a8EN3oIijHY+KjS+2mg==&lt;/Token&gt;&lt;/AuthenticationHeader&gt;&lt;/S:Header&gt;&lt;S:Body&gt;&lt;ns2:xxMmSender xmlns:ns2=&quot;http://xxx.com/&quot;&gt;&lt;arg0 xmlns=&quot;&quot;&gt;` + phone + `&lt;/arg0&gt;&lt;arg1 xmlns=&quot;&quot;&gt;` +     msg + `&lt;/arg1&gt;&lt;arg2 xmlns=&quot;&quot;&gt;yunwei.alarm&lt;/arg2&gt;&lt;arg3     xmlns=&quot;&quot;&gt;&lt;/arg3&gt;&lt;/ns2:xxMmSender&gt;&lt;/S:Body&gt;&lt;/    S:Envelope&gt;`
     log.Println(strings.NewReader(body))
-    req, err := http.NewRequest(&ldquo;post&rdquo;, uri,     bytes.NewBuffer([]byte(body)))
+    req, err := http.NewRequest(&quot;post&quot;, uri,     bytes.NewBuffer([]byte(body)))
     if err != nil {
         log.Println(err)
         // handle error
     }
-    req.Host = &ldquo;xxx.com&rdquo;
+    req.Host = &quot;xxx.com&quot;
     resp, err := client.Do(req)
     if err != nil {
         log.Println(err)
@@ -137,12 +128,14 @@ import cgi</p>
     log.Println(resp)
     //log.Println(respbody)
     return err
-}</p>
-
-<p>func main() {
-    sendmessage(&ldquo;135xxxxxxx&rdquo;, &ldquo;testGolang&rdquo;)
 }
-然而我发现此请求并没有获取到短信，于是挂上代理进行抓包，发现其响应码为502.</p>
+
+func main() {
+    sendmessage(&quot;135xxxxxxx&quot;, &quot;testGolang&quot;)
+}
+</code></pre>
+
+<p>然而我发现此请求并没有获取到短信，于是挂上代理进行抓包，发现其响应码为502.</p>
 
 <p>对比Python的正常请求：</p>
 
