@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -8,18 +8,14 @@
   <meta name="twitter:title" content="记一次golang - BIPABO1L&#39;s BLog" />
   <meta name="description" content="详情 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。
 Python代码如下：
-# coding=utf-8 import requests import cgi def send(phone, msg): url = &#39;http://xxx.com/MoblMsgSender&#39; headers = { &#39;Host&#39;: &#39;xxx.com&#39;, } body = &#39;&lt;?xml version=&quot;1.0&quot; ?&gt;&lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&lt;S:Header&gt;&lt;AuthenticationHeader xmlns=&quot;http://xxx.com/MoblMsgSender&quot;&gt;&lt;Token&gt;Tokenxxx==&lt;/Token&gt;&lt;/AuthenticationHeader&gt;&lt;/S:Header&gt;&lt;S:Body&gt;&lt;ns2:xxMmSender xmlns:ns2=&quot;http://xxx.com/&quot;&gt;&lt;arg0 xmlns=&quot;&quot;&gt;%s&lt;/arg0&gt;&lt;arg1 xmlns=&quot;&quot;&gt;%s&lt;/arg1&gt;&lt;arg2 xmlns=&quot;&quot;&gt;yunwei.alarm&lt;/arg2&gt;&lt;arg3 xmlns=&quot;&quot;&gt;&lt;/arg3&gt;&lt;/ns2:xxMmSender&gt;&lt;/S:Body&gt;&lt;/S:Envelope&gt;&#39; % (phone, cgi.escape(msg)) try: r = requests.post(url, data=body, headers=headers) if &#39;&lt;return&gt;true&lt;/return&gt;&#39; in r.content: return True except: pass return False send(&quot;135xxxxxxx&quot;,&quot;testPython&quot;)  果然成功收到了短信，证明接口调用成功。
-于是我转化成golang代码：
-package main import ( &quot;bytes&quot; &quot;crypto/tls&quot; &quot;log&quot; &quot;net/http&quot; &quot;strings&quot; &quot;time&quot; ) func sendmessage(phone string, msg string) error { uri := `http://xxx.">
+# coding=utf-8 import requests import cgi def send(phone, msg): url = &#39;http://xxx.">
   <meta property="og:description" content="详情 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。
 Python代码如下：
-# coding=utf-8 import requests import cgi def send(phone, msg): url = &#39;http://xxx.com/MoblMsgSender&#39; headers = { &#39;Host&#39;: &#39;xxx.com&#39;, } body = &#39;&lt;?xml version=&quot;1.0&quot; ?&gt;&lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&lt;S:Header&gt;&lt;AuthenticationHeader xmlns=&quot;http://xxx.com/MoblMsgSender&quot;&gt;&lt;Token&gt;Tokenxxx==&lt;/Token&gt;&lt;/AuthenticationHeader&gt;&lt;/S:Header&gt;&lt;S:Body&gt;&lt;ns2:xxMmSender xmlns:ns2=&quot;http://xxx.com/&quot;&gt;&lt;arg0 xmlns=&quot;&quot;&gt;%s&lt;/arg0&gt;&lt;arg1 xmlns=&quot;&quot;&gt;%s&lt;/arg1&gt;&lt;arg2 xmlns=&quot;&quot;&gt;yunwei.alarm&lt;/arg2&gt;&lt;arg3 xmlns=&quot;&quot;&gt;&lt;/arg3&gt;&lt;/ns2:xxMmSender&gt;&lt;/S:Body&gt;&lt;/S:Envelope&gt;&#39; % (phone, cgi.escape(msg)) try: r = requests.post(url, data=body, headers=headers) if &#39;&lt;return&gt;true&lt;/return&gt;&#39; in r.content: return True except: pass return False send(&quot;135xxxxxxx&quot;,&quot;testPython&quot;)  果然成功收到了短信，证明接口调用成功。
-于是我转化成golang代码：
-package main import ( &quot;bytes&quot; &quot;crypto/tls&quot; &quot;log&quot; &quot;net/http&quot; &quot;strings&quot; &quot;time&quot; ) func sendmessage(phone string, msg string) error { uri := `http://xxx.">
+# coding=utf-8 import requests import cgi def send(phone, msg): url = &#39;http://xxx.">
   <meta name="twitter:description" content="详情 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。
 Python代码如下：
 # coding=utf-8 import requests import cgi def send(phone, msg): url = …">
-  <meta name="author" content=""/>
+  <meta name="author" content="Bipabo1l"/>
   <meta property="og:site_name" content="BIPABO1L&#39;s BLog" />
   <meta property="og:url" content="http://bipabo1l.github.io/post/%E8%AE%B0%E4%B8%80%E6%AC%A1golang_post_xml%E6%97%B6%E8%BF%94%E5%9B%9E502%E9%94%99%E8%AF%AF%E7%A0%81%E7%9A%84%E9%97%AE%E9%A2%98/" />
   <meta property="og:type" content="article" />
@@ -41,6 +37,13 @@ Python代码如下：
   <nav class="site-navi">
     <h1 class="site-title"><a href="/">BIPABO1L&#39;s BLog</a></h1>
     <ul class="site-navi-items">
+      <li class="site-navi-item-home"><a href="/" title="Home">Home</a></li>
+      <li class="site-navi-item-categories"><a href="/categories/" title="Categories">Categories</a></li>
+      <li class="site-navi-item-tags"><a href="/tags/" title="Tags">Tags</a></li>
+      <li class="site-navi-item-archives"><a href="/archives/" title="Archives">Archives</a></li>
+      <li class="site-navi-item-books"><a href="/books/" title="Books">Books</a></li>
+      <li class="site-navi-item-link"><a href="/link/" title="Links">Links</a></li>
+      <li class="site-navi-item-about"><a href="/about/" title="About">About</a></li>
 
        <li class="site-navi-item-plan"><a href="/posts/plan/" title="plan">Plan</a></li>
     </ul>
@@ -176,8 +179,9 @@ gitalk.render('gitalk-container')
 
 
 <div class="site-footer">
-  <div class="copyright"></div>
+  <div class="copyright">&copy; Copyright 2018 bipabo1l</div>
   <ul class="site-footer-items">
+    <li class="site-footer-item-about"><a href="/about/" title="About">About</a></li>
   </ul>
   <div class="powerdby">
     Powered by <a href="https://gohugo.io/">Hugo</a>  and Dean

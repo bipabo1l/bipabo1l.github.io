@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <title>Posts - BIPABO1L&#39;s BLog</title>
   <meta property="og:title" content="Posts - BIPABO1L&#39;s BLog" />
   <meta name="twitter:title" content="Posts - BIPABO1L&#39;s BLog" />
-  <meta name="author" content=""/>
+  <meta name="author" content="Bipabo1l"/>
   <meta property="og:site_name" content="BIPABO1L&#39;s BLog" />
   <meta property="og:url" content="http://bipabo1l.github.io/post/" />
   <meta property="og:type" content="website" />
@@ -30,6 +30,13 @@
   <nav class="site-navi">
     <h1 class="site-title"><a href="/">BIPABO1L&#39;s BLog</a></h1>
     <ul class="site-navi-items">
+      <li class="site-navi-item-home"><a href="/" title="Home">Home</a></li>
+      <li class="site-navi-item-categories"><a href="/categories/" title="Categories">Categories</a></li>
+      <li class="site-navi-item-tags"><a href="/tags/" title="Tags">Tags</a></li>
+      <li class="site-navi-item-archives"><a href="/archives/" title="Archives">Archives</a></li>
+      <li class="site-navi-item-books"><a href="/books/" title="Books">Books</a></li>
+      <li class="site-navi-item-link"><a href="/link/" title="Links">Links</a></li>
+      <li class="site-navi-item-about"><a href="/about/" title="About">About</a></li>
 
        <li class="site-navi-item-plan"><a href="/posts/plan/" title="plan">Plan</a></li>
     </ul>
@@ -50,9 +57,7 @@
         <div class="article-content">
           详情 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。
 Python代码如下：
-# coding=utf-8 import requests import cgi def send(phone, msg): url = 'http://xxx.com/MoblMsgSender' headers = { 'Host': 'xxx.com', } body = '&lt;?xml version=&quot;1.0&quot; ?&gt;&lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&lt;S:Header&gt;&lt;AuthenticationHeader xmlns=&quot;http://xxx.com/MoblMsgSender&quot;&gt;&lt;Token&gt;Tokenxxx==&lt;/Token&gt;&lt;/AuthenticationHeader&gt;&lt;/S:Header&gt;&lt;S:Body&gt;&lt;ns2:xxMmSender xmlns:ns2=&quot;http://xxx.com/&quot;&gt;&lt;arg0 xmlns=&quot;&quot;&gt;%s&lt;/arg0&gt;&lt;arg1 xmlns=&quot;&quot;&gt;%s&lt;/arg1&gt;&lt;arg2 xmlns=&quot;&quot;&gt;yunwei.alarm&lt;/arg2&gt;&lt;arg3 xmlns=&quot;&quot;&gt;&lt;/arg3&gt;&lt;/ns2:xxMmSender&gt;&lt;/S:Body&gt;&lt;/S:Envelope&gt;' % (phone, cgi.escape(msg)) try: r = requests.post(url, data=body, headers=headers) if '&lt;return&gt;true&lt;/return&gt;' in r.content: return True except: pass return False send(&quot;135xxxxxxx&quot;,&quot;testPython&quot;)  果然成功收到了短信，证明接口调用成功。
-于是我转化成golang代码：
-package main import ( &quot;bytes&quot; &quot;crypto/tls&quot; &quot;log&quot; &quot;net/http&quot; &quot;strings&quot; &quot;time&quot; ) func sendmessage(phone string, msg string) error { uri := `http://xxx.
+# coding=utf-8 import requests import cgi def send(phone, msg): url = 'http://xxx.
         </div>
         <div class="article-readmore"><a href="/post/%E8%AE%B0%E4%B8%80%E6%AC%A1golang_post_xml%E6%97%B6%E8%BF%94%E5%9B%9E502%E9%94%99%E8%AF%AF%E7%A0%81%E7%9A%84%E9%97%AE%E9%A2%98/">Read more...</a></div>
         <div class="article-floatclear"></div>
@@ -66,30 +71,9 @@ package main import ( &quot;bytes&quot; &quot;crypto/tls&quot; &quot;log&quot; &
           <li class="article-meta-date"><time>December 25, 2018</time></li>
         </ul>
         <div class="article-content">
-          
-
-<h1 id="介绍">介绍</h1>
-
-<p>在Android APK加载时，通常情况下会请求各种资源，这其中就包括请求本地或者外部服务器的压缩文件。而由于zip格式压缩文件允许”../“的字符串，攻击者可以在APK加载时对应用本来想加载的文件进行“调虎离山”，将自己利用多个”../“生成的压缩文件替换原文件，这种情况下如果APK对这个zip文件解析不当，那么轻则导致文件覆盖，重则导致本地拒绝服务，甚至代码执行。</p>
-
-<h1 id="漏洞原理">漏洞原理</h1>
-
-<p>这里以一个Apk为例说明，下图中，我反编译了一个APK，获取到了dex文件，利用dex2jar转换成了java中的jar文件并利用Java Decomplier进行读取。
-定位到存在ZipEntry漏洞的地方，如下图所示：</p>
-
-<p>可以发现代码的逻辑时调用zipEntry类中的getName()方法，获取到解压到的Zip文件中的自文件名称，但是并未进行任何的../过滤，从而允许了攻击者构造../的zip包进行攻击的可能，攻击者可以构造精心构造的zip包，在root过的手机中抓包，对包含zip的调用包进行篡改，将原zip包篡改成本地构造后的zip包，随后在本地查看文件管理器，可以发现攻击者指定的目录下的文件。
-构造特定的zip包代码如下：（使用java编写）</p>
-
-<p>执行后在zippoc根目录下可发现新生成的test.zip文件</p>
-
-<p>上传包中篡改该文件即可。
-修复方案为在上传包中对文件名进行严格的校验，过滤”../“</p>
-
-<p>#后记
-该漏洞为移动安全漏洞中的低危或中危漏洞，其实不是很好利用，利用方式略微鸡肋但是影响却不小，但很多厂商并未对其进行过多的校验。笔者就发现了滴滴代驾司机客户端、斗鱼Android客户端、Wifi万能钥匙客户端等等均存在此漏洞并进行了报告。</p>
-
-<p>该漏洞如果结合了其他漏洞也会产生较为严重的影响，希望厂商予以重视。</p>
-
+          介绍 在Android APK加载时，通常情况下会请求各种资源，这其中就包括请求本地或者外部服务器的压缩文件。而由于zip格式压缩文件允许”../“的字符串，攻击者可以在APK加载时对应用本来想加载的文件进行“调虎离山”，将自己利用多个”../“生成的压缩文件替换原文件，这种情况下如果APK对这个zip文件解析不当，那么轻则导致文件覆盖，重则导致本地拒绝服务，甚至代码执行。
+漏洞原理 这里以一个Apk为例说明，下图中，我反编译了一个APK，获取到了dex文件，利用dex2jar转换成了java中的jar文件并利用Java Decomplier进行读取。 定位到存在ZipEntry漏洞的地方，如下图所示：
+可以发现代码的逻辑时调用zipEntry类中的getName()方法，获取到解压到的Zip文件中的自文件名称，但是并未进行任何的../过滤，从而允许了攻击者构造../的zip包进行攻击的可能，攻击者可以构造精心构造的zip包，在root过的手机中抓包，对包含zip的调用包进行篡改，将原zip包篡改成本地构造后的zip包，随后在本地查看文件管理器，可以发现攻击者指定的目录下的文件。 构造特定的zip包代码如下：（使用java编写）
         </div>
         <div class="article-readmore"><a href="/post/%E6%B5%85%E6%9E%90android%E4%B8%ADzipentry%E6%BC%8F%E6%B4%9E/">Read more...</a></div>
         <div class="article-floatclear"></div>
@@ -102,13 +86,14 @@ package main import ( &quot;bytes&quot; &quot;crypto/tls&quot; &quot;log&quot; &
 
 
 <div class="site-footer">
-  <div class="copyright"></div>
+  <div class="copyright">&copy; Copyright 2018 bipabo1l</div>
   <ul class="site-footer-items">
     <li class="site-footer-item-rsslink">
       <a href="/post/index.xml" type="application/rss+xml" target="_blank" title="RSS">
         <i class="fas fa-rss"></i>
       </a>
     </li>
+    <li class="site-footer-item-about"><a href="/about/" title="About">About</a></li>
   </ul>
   <div class="powerdby">
     Powered by <a href="https://gohugo.io/">Hugo</a>  and Dean
