@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>BIPABO1L&#39;s BLog</title>
+    <link>http://bipabo1l.github.io/books/</link>
+    <description>Recent content on BIPABO1L&#39;s BLog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>&amp;copy; Copyright 2018 bipabo1l</copyright>
+    
+	<atom:link href="http://bipabo1l.github.io/books/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+  </channel>
+</rss>
