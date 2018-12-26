@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <title>Posts - BIPABO1L&#39;s BLog</title>
-  <meta property="og:title" content="Posts - BIPABO1L&#39;s BLog" />
-  <meta name="twitter:title" content="Posts - BIPABO1L&#39;s BLog" />
+  <title>Golang - BIPABO1L&#39;s BLog</title>
+  <meta property="og:title" content="Golang - BIPABO1L&#39;s BLog" />
+  <meta name="twitter:title" content="Golang - BIPABO1L&#39;s BLog" />
   <meta name="author" content="Bipabo1l"/>
   <meta property="og:site_name" content="BIPABO1L&#39;s BLog" />
-  <meta property="og:url" content="http://bipabo1l.github.io/post/" />
+  <meta property="og:url" content="http://bipabo1l.github.io/categories/golang/" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary" />
   <meta name="generator" content="Hugo 0.53" />
-  <link href="/post/index.xml" rel="alternate" type="application/rss+xml" title="BIPABO1L&#39;s BLog" />
-  <link href="/post/index.xml" rel="feed" type="application/rss+xml" title="BIPABO1L&#39;s BLog" />
+  <link href="/categories/golang/index.xml" rel="alternate" type="application/rss+xml" title="BIPABO1L&#39;s BLog" />
+  <link href="/categories/golang/index.xml" rel="feed" type="application/rss+xml" title="BIPABO1L&#39;s BLog" />
 
   <link rel="stylesheet" href="/css/style.css" media="all" />
   <link rel="stylesheet" href="/css/syntax.css" media="all" />
@@ -45,7 +45,7 @@
 <hr class="site-header-bottom">
 
   <div class="main" role="main">
-    <section class="list section-list">
+    <section class="list taxonomy-list">
       <article class="article">
         <a href="/post/%E8%AE%B0%E4%B8%80%E6%AC%A1golang_post_xml%E6%97%B6%E8%BF%94%E5%9B%9E502%E9%94%99%E8%AF%AF%E7%A0%81%E7%9A%84%E9%97%AE%E9%A2%98/" class="article-titles">
           <h2 class="article-title">记一次golang_post_xml时返回错误码的问题</h2>
@@ -80,22 +80,6 @@ Python代码如下：
         <div class="article-readmore"><a href="/post/%E8%AE%B0%E4%B8%80%E6%AC%A1golang_post_xml%E6%97%B6%E8%BF%94%E5%9B%9E502%E9%94%99%E8%AF%AF%E7%A0%81%E7%9A%84%E9%97%AE%E9%A2%98/">Read more...</a></div>
         <div class="article-floatclear"></div>
       </article>
-      <article class="article">
-        <a href="/post/%E6%B5%85%E6%9E%90android%E4%B8%ADzipentry%E6%BC%8F%E6%B4%9E/" class="article-titles">
-          <h2 class="article-title">浅析Android中ZipEntry漏洞</h2>
-          
-        </a>
-        <ul class="article-meta">
-          <li class="article-meta-date"><time>December 25, 2018</time></li>
-        </ul>
-        <div class="article-content">
-          介绍 在Android APK加载时，通常情况下会请求各种资源，这其中就包括请求本地或者外部服务器的压缩文件。而由于zip格式压缩文件允许”../“的字符串，攻击者可以在APK加载时对应用本来想加载的文件进行“调虎离山”，将自己利用多个”../“生成的压缩文件替换原文件，这种情况下如果APK对这个zip文件解析不当，那么轻则导致文件覆盖，重则导致本地拒绝服务，甚至代码执行。
-漏洞原理 这里以一个Apk为例说明，下图中，我反编译了一个APK，获取到了dex文件，利用dex2jar转换成了java中的jar文件并利用Java Decomplier进行读取。 定位到存在ZipEntry漏洞的地方，如下图所示：
-可以发现代码的逻辑时调用zipEntry类中的getName()方法，获取到解压到的Zip文件中的自文件名称，但是并未进行任何的../过滤，从而允许了攻击者构造../的zip包进行攻击的可能，攻击者可以构造精心构造的zip包，在root过的手机中抓包，对包含zip的调用包进行篡改，将原zip包篡改成本地构造后的zip包，随后在本地查看文件管理器，可以发现攻击者指定的目录下的文件。 构造特定的zip包代码如下：（使用java编写）
-        </div>
-        <div class="article-readmore"><a href="/post/%E6%B5%85%E6%9E%90android%E4%B8%ADzipentry%E6%BC%8F%E6%B4%9E/">Read more...</a></div>
-        <div class="article-floatclear"></div>
-      </article>
     </section>
     
 
@@ -107,7 +91,7 @@ Python代码如下：
   <div class="copyright">&copy; Copyright 2018 bipabo1l</div>
   <ul class="site-footer-items">
     <li class="site-footer-item-rsslink">
-      <a href="/post/index.xml" type="application/rss+xml" target="_blank" title="RSS">
+      <a href="/categories/golang/index.xml" type="application/rss+xml" target="_blank" title="RSS">
         <i class="fas fa-rss"></i>
       </a>
     </li>
