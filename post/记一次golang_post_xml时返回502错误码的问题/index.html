@@ -8,13 +8,13 @@
   <meta name="twitter:title" content="记一次golang_post_xml时返回错误码的问题 - BIPABO1L&#39;s BLog" />
   <meta name="description" content="详情 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。
 Python代码如下：
-# coding=utf-8 import requests import cgi def send(phone, msg): url = &#39;http://xxx.">
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18  # coding=utf-8 import requests import cgi def send(phone, msg): url = &#39;http://xxx.">
   <meta property="og:description" content="详情 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。
 Python代码如下：
-# coding=utf-8 import requests import cgi def send(phone, msg): url = &#39;http://xxx.">
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18  # coding=utf-8 import requests import cgi def send(phone, msg): url = &#39;http://xxx.">
   <meta name="twitter:description" content="详情 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。
 Python代码如下：
-# coding=utf-8 import requests import cgi def send(phone, msg): url = …">
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18  # coding=utf-8 import requests …">
   <meta name="author" content="Bipabo1l"/>
   <meta property="og:site_name" content="BIPABO1L&#39;s BLog" />
   <meta property="og:url" content="http://bipabo1l.github.io/post/%E8%AE%B0%E4%B8%80%E6%AC%A1golang_post_xml%E6%97%B6%E8%BF%94%E5%9B%9E502%E9%94%99%E8%AF%AF%E7%A0%81%E7%9A%84%E9%97%AE%E9%A2%98/" />
@@ -59,7 +59,7 @@ Python代码如下：
       
       <hr class="article-title-bottom">
       <ul class="article-meta">
-        <li class="article-meta-date"><time>December 25, 2018</time></li>
+        <li class="article-meta-date"><time>January 1, 0001</time></li>
         <li class="article-meta-categories">
           <a href="/categories/golang/">
             <i class="fas fa-folder"></i>
@@ -85,77 +85,144 @@ Python代码如下：
 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。</p>
 
 <p>Python代码如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># coding=utf-8</span>
 
-<pre><code># coding=utf-8
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">cgi</span>
 
-import requests
-import cgi
-
-def send(phone, msg):
-    url = 'http://xxx.com/MoblMsgSender'
-    headers = {
-        'Host': 'xxx.com',
-    }
-    body = '&lt;?xml version=&quot;1.0&quot; ?&gt;&lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&lt;S:Header&gt;&lt;AuthenticationHeader xmlns=&quot;http://xxx.com/MoblMsgSender&quot;&gt;&lt;Token&gt;Tokenxxx==&lt;/Token&gt;&lt;/AuthenticationHeader&gt;&lt;/S:Header&gt;&lt;S:Body&gt;&lt;ns2:xxMmSender xmlns:ns2=&quot;http://xxx.com/&quot;&gt;&lt;arg0 xmlns=&quot;&quot;&gt;%s&lt;/arg0&gt;&lt;arg1 xmlns=&quot;&quot;&gt;%s&lt;/arg1&gt;&lt;arg2 xmlns=&quot;&quot;&gt;yunwei.alarm&lt;/arg2&gt;&lt;arg3 xmlns=&quot;&quot;&gt;&lt;/arg3&gt;&lt;/ns2:xxMmSender&gt;&lt;/S:Body&gt;&lt;/S:Envelope&gt;' % (phone, cgi.escape(msg))
-    try:
-        r = requests.post(url, data=body, headers=headers)
-        if '&lt;return&gt;true&lt;/return&gt;' in r.content:
-            return True
-    except:
-        pass
-    return False
-
-send(&quot;135xxxxxxx&quot;,&quot;testPython&quot;)
+<span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="n">phone</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://xxx.com/MoblMsgSender&#39;</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;Host&#39;</span><span class="p">:</span> <span class="s1">&#39;xxx.com&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="s1">&#39;&lt;?xml version=&#34;1.0&#34; ?&gt;&lt;S:Envelope xmlns:S=&#34;http://schemas.xmlsoap.org/soap/envelope/&#34;&gt;&lt;S:Header&gt;&lt;AuthenticationHeader xmlns=&#34;http://xxx.com/MoblMsgSender&#34;&gt;&lt;Token&gt;Tokenxxx==&lt;/Token&gt;&lt;/AuthenticationHeader&gt;&lt;/S:Header&gt;&lt;S:Body&gt;&lt;ns2:xxMmSender xmlns:ns2=&#34;http://xxx.com/&#34;&gt;&lt;arg0 xmlns=&#34;&#34;&gt;</span><span class="si">%s</span><span class="s1">&lt;/arg0&gt;&lt;arg1 xmlns=&#34;&#34;&gt;</span><span class="si">%s</span><span class="s1">&lt;/arg1&gt;&lt;arg2 xmlns=&#34;&#34;&gt;yunwei.alarm&lt;/arg2&gt;&lt;arg3 xmlns=&#34;&#34;&gt;&lt;/arg3&gt;&lt;/ns2:xxMmSender&gt;&lt;/S:Body&gt;&lt;/S:Envelope&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">phone</span><span class="p">,</span> <span class="n">cgi</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">body</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;&lt;return&gt;true&lt;/return&gt;&#39;</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">return</span> <span class="bp">False</span></code></pre></td></tr></table>
+</div>
+</div>
+<pre><code>send(&quot;135xxxxxxx&quot;,&quot;testPython&quot;)
 </code></pre>
 
 <p>果然成功收到了短信，证明接口调用成功。</p>
 
 <p>于是我转化成golang代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-golang" data-lang="golang"><span class="kn">package</span> <span class="nx">main</span>
 
-<pre><code>package main
+<span class="kn">import</span> <span class="p">(</span>
+    <span class="s">&#34;bytes&#34;</span>
+    <span class="s">&#34;crypto/tls&#34;</span>
+    <span class="s">&#34;log&#34;</span>
+    <span class="s">&#34;net/http&#34;</span>
+    <span class="s">&#34;strings&#34;</span>
+    <span class="s">&#34;time&#34;</span>
+<span class="p">)</span>
 
-import (
-    &quot;bytes&quot;
-    &quot;crypto/tls&quot;
-    &quot;log&quot;
-    &quot;net/http&quot;
-    &quot;strings&quot;
-    &quot;time&quot;
-)
+<span class="kd">func</span> <span class="nf">sendmessage</span><span class="p">(</span><span class="nx">phone</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">msg</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+    <span class="nx">uri</span> <span class="o">:=</span> <span class="s">`http://xxx.com/MoblMsgSender`</span>
+    <span class="c1">//proxy, _ := url.Parse(&#34;http://127.0.0.1:8080&#34;)
+</span><span class="c1"></span>    <span class="nx">tr</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">http</span><span class="p">.</span><span class="nx">Transport</span><span class="p">{</span>
+        <span class="c1">//Proxy:           http.ProxyURL(proxy),
+</span><span class="c1"></span>        <span class="nx">TLSClientConfig</span><span class="p">:</span> <span class="o">&amp;</span><span class="nx">tls</span><span class="p">.</span><span class="nx">Config</span><span class="p">{</span><span class="nx">InsecureSkipVerify</span><span class="p">:</span> <span class="kc">true</span><span class="p">},</span>
+    <span class="p">}</span>
+    <span class="nx">client</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">http</span><span class="p">.</span><span class="nx">Client</span><span class="p">{</span>
+        <span class="nx">Transport</span><span class="p">:</span> <span class="nx">tr</span><span class="p">,</span>
+        <span class="nx">Timeout</span><span class="p">:</span>   <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="c1">//超时时间
+</span><span class="c1"></span>    <span class="p">}</span>
+    <span class="nx">body</span> <span class="o">:=</span> <span class="s">`&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;&lt;S:Envelope xmlns:S=&#34;http://schemas.xmlsoap.org/soap/envelope/&#34;&gt;&lt;S:Header&gt;&lt;AuthenticationHeader xmlns=&#34;http://mms.360buy.com/services/MoblMsgSender&#34;&gt;&lt;Token&gt;666a8EN3oIijHY+KjS+2mg==&lt;/Token&gt;&lt;/AuthenticationHeader&gt;&lt;/S:Header&gt;&lt;S:Body&gt;&lt;ns2:xxMmSender xmlns:ns2=&#34;http://xxx.com/&#34;&gt;&lt;arg0 xmlns=&#34;&#34;&gt;`</span> <span class="o">+</span> <span class="nx">phone</span> <span class="o">+</span> <span class="s">`&lt;/arg0&gt;&lt;arg1 xmlns=&#34;&#34;&gt;`</span> <span class="o">+</span>     <span class="nx">msg</span> <span class="o">+</span> <span class="s">`&lt;/arg1&gt;&lt;arg2 xmlns=&#34;&#34;&gt;yunwei.alarm&lt;/arg2&gt;&lt;arg3     xmlns=&#34;&#34;&gt;&lt;/arg3&gt;&lt;/ns2:xxMmSender&gt;&lt;/S:Body&gt;&lt;/    S:Envelope&gt;`</span>
+    <span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">strings</span><span class="p">.</span><span class="nf">NewReader</span><span class="p">(</span><span class="nx">body</span><span class="p">))</span>
+    <span class="nx">req</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">http</span><span class="p">.</span><span class="nf">NewRequest</span><span class="p">(</span><span class="s">&#34;post&#34;</span><span class="p">,</span> <span class="nx">uri</span><span class="p">,</span>     <span class="nx">bytes</span><span class="p">.</span><span class="nf">NewBuffer</span><span class="p">([]</span><span class="nb">byte</span><span class="p">(</span><span class="nx">body</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+        <span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+        <span class="c1">// handle error
+</span><span class="c1"></span>    <span class="p">}</span>
+    <span class="nx">req</span><span class="p">.</span><span class="nx">Host</span> <span class="p">=</span> <span class="s">&#34;xxx.com&#34;</span>
+    <span class="nx">resp</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">client</span><span class="p">.</span><span class="nf">Do</span><span class="p">(</span><span class="nx">req</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+        <span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="nx">log</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">resp</span><span class="p">)</span>
+    <span class="c1">//log.Println(respbody)
+</span><span class="c1"></span>    <span class="k">return</span> <span class="nx">err</span>
+<span class="p">}</span>
 
-func sendmessage(phone string, msg string) error {
-    uri := `http://xxx.com/MoblMsgSender`
-    //proxy, _ := url.Parse(&quot;http://127.0.0.1:8080&quot;)
-    tr := &amp;http.Transport{
-        //Proxy:           http.ProxyURL(proxy),
-        TLSClientConfig: &amp;tls.Config{InsecureSkipVerify: true},
-    }
-    client := &amp;http.Client{
-        Transport: tr,
-        Timeout:   time.Second * 5, //超时时间
-    }
-    body := `&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;S:Envelope xmlns:S=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&lt;S:Header&gt;&lt;AuthenticationHeader xmlns=&quot;http://mms.360buy.com/services/MoblMsgSender&quot;&gt;&lt;Token&gt;666a8EN3oIijHY+KjS+2mg==&lt;/Token&gt;&lt;/AuthenticationHeader&gt;&lt;/S:Header&gt;&lt;S:Body&gt;&lt;ns2:xxMmSender xmlns:ns2=&quot;http://xxx.com/&quot;&gt;&lt;arg0 xmlns=&quot;&quot;&gt;` + phone + `&lt;/arg0&gt;&lt;arg1 xmlns=&quot;&quot;&gt;` +     msg + `&lt;/arg1&gt;&lt;arg2 xmlns=&quot;&quot;&gt;yunwei.alarm&lt;/arg2&gt;&lt;arg3     xmlns=&quot;&quot;&gt;&lt;/arg3&gt;&lt;/ns2:xxMmSender&gt;&lt;/S:Body&gt;&lt;/    S:Envelope&gt;`
-    log.Println(strings.NewReader(body))
-    req, err := http.NewRequest(&quot;post&quot;, uri,     bytes.NewBuffer([]byte(body)))
-    if err != nil {
-        log.Println(err)
-        // handle error
-    }
-    req.Host = &quot;xxx.com&quot;
-    resp, err := client.Do(req)
-    if err != nil {
-        log.Println(err)
-    }
-    log.Println(resp)
-    //log.Println(respbody)
-    return err
-}
-
-func main() {
-    sendmessage(&quot;135xxxxxxx&quot;, &quot;testGolang&quot;)
-}
-</code></pre>
-
+<span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nf">sendmessage</span><span class="p">(</span><span class="s">&#34;135xxxxxxx&#34;</span><span class="p">,</span> <span class="s">&#34;testGolang&#34;</span><span class="p">)</span>
+<span class="p">}</span></code></pre></td></tr></table>
+</div>
+</div>
 <p>然而我发现此请求并没有获取到短信，于是挂上代理进行抓包，发现其响应码为502.</p>
 
 <p>对比Python的正常请求：</p>
@@ -168,10 +235,10 @@ func main() {
 
 
     <ul class="pager article-pager">
-      <li class="pager-newer pager-noitem">&lt; Newer</li>
-      <li class="pager-older">
-        <a href="/post/%E6%B5%85%E6%9E%90android%E4%B8%ADzipentry%E6%BC%8F%E6%B4%9E/" data-toggle="tooltip" data-placement="top" title="浅析Android中ZipEntry漏洞">Older &gt;</a>
+      <li class="pager-newer">
+          <a href="/post/%E6%B5%85%E6%9E%90android%E4%B8%ADzipentry%E6%BC%8F%E6%B4%9E/" data-toggle="tooltip" data-placement="top" title="浅析Android中ZipEntry漏洞">&lt; Newer</a>
       </li>
+      <li class="pager-older pager-noitem">Older &gt;</li>
     </ul>
 
           <div id="gitalk-container"></div>

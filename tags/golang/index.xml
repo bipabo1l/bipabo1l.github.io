@@ -7,7 +7,6 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>&amp;copy; Copyright 2018 bipabo1l</copyright>
-    <lastBuildDate>Tue, 25 Dec 2018 17:50:01 +0800</lastBuildDate>
     
 	<atom:link href="http://bipabo1l.github.io/tags/golang/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,12 +14,12 @@
     <item>
       <title>记一次golang_post_xml时返回错误码的问题</title>
       <link>http://bipabo1l.github.io/post/%E8%AE%B0%E4%B8%80%E6%AC%A1golang_post_xml%E6%97%B6%E8%BF%94%E5%9B%9E502%E9%94%99%E8%AF%AF%E7%A0%81%E7%9A%84%E9%97%AE%E9%A2%98/</link>
-      <pubDate>Tue, 25 Dec 2018 17:50:01 +0800</pubDate>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>http://bipabo1l.github.io/post/%E8%AE%B0%E4%B8%80%E6%AC%A1golang_post_xml%E6%97%B6%E8%BF%94%E5%9B%9E502%E9%94%99%E8%AF%AF%E7%A0%81%E7%9A%84%E9%97%AE%E9%A2%98/</guid>
       <description>详情 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。
 Python代码如下：
-# coding=utf-8 import requests import cgi def send(phone, msg): url = &#39;http://xxx.</description>
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18  # coding=utf-8 import requests import cgi def send(phone, msg): url = &amp;#39;http://xxx.</description>
     </item>
     
   </channel>

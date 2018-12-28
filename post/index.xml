@@ -7,21 +7,10 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>&amp;copy; Copyright 2018 bipabo1l</copyright>
-    <lastBuildDate>Tue, 25 Dec 2018 17:50:01 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 25 Dec 2018 17:23:29 +0800</lastBuildDate>
     
 	<atom:link href="http://bipabo1l.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>记一次golang_post_xml时返回错误码的问题</title>
-      <link>http://bipabo1l.github.io/post/%E8%AE%B0%E4%B8%80%E6%AC%A1golang_post_xml%E6%97%B6%E8%BF%94%E5%9B%9E502%E9%94%99%E8%AF%AF%E7%A0%81%E7%9A%84%E9%97%AE%E9%A2%98/</link>
-      <pubDate>Tue, 25 Dec 2018 17:50:01 +0800</pubDate>
-      
-      <guid>http://bipabo1l.github.io/post/%E8%AE%B0%E4%B8%80%E6%AC%A1golang_post_xml%E6%97%B6%E8%BF%94%E5%9B%9E502%E9%94%99%E8%AF%AF%E7%A0%81%E7%9A%84%E9%97%AE%E9%A2%98/</guid>
-      <description>详情 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。
-Python代码如下：
-# coding=utf-8 import requests import cgi def send(phone, msg): url = &#39;http://xxx.</description>
-    </item>
     
     <item>
       <title>浅析Android中ZipEntry漏洞</title>
@@ -32,6 +21,17 @@ Python代码如下：
       <description>介绍 在Android APK加载时，通常情况下会请求各种资源，这其中就包括请求本地或者外部服务器的压缩文件。而由于zip格式压缩文件允许”../“的字符串，攻击者可以在APK加载时对应用本来想加载的文件进行“调虎离山”，将自己利用多个”../“生成的压缩文件替换原文件，这种情况下如果APK对这个zip文件解析不当，那么轻则导致文件覆盖，重则导致本地拒绝服务，甚至代码执行。
 漏洞原理 这里以一个Apk为例说明，下图中，我反编译了一个APK，获取到了dex文件，利用dex2jar转换成了java中的jar文件并利用Java Decomplier进行读取。 定位到存在ZipEntry漏洞的地方，如下图所示：
 可以发现代码的逻辑时调用zipEntry类中的getName()方法，获取到解压到的Zip文件中的自文件名称，但是并未进行任何的../过滤，从而允许了攻击者构造../的zip包进行攻击的可能，攻击者可以构造精心构造的zip包，在root过的手机中抓包，对包含zip的调用包进行篡改，将原zip包篡改成本地构造后的zip包，随后在本地查看文件管理器，可以发现攻击者指定的目录下的文件。 构造特定的zip包代码如下：（使用java编写）</description>
+    </item>
+    
+    <item>
+      <title>记一次golang_post_xml时返回错误码的问题</title>
+      <link>http://bipabo1l.github.io/post/%E8%AE%B0%E4%B8%80%E6%AC%A1golang_post_xml%E6%97%B6%E8%BF%94%E5%9B%9E502%E9%94%99%E8%AF%AF%E7%A0%81%E7%9A%84%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://bipabo1l.github.io/post/%E8%AE%B0%E4%B8%80%E6%AC%A1golang_post_xml%E6%97%B6%E8%BF%94%E5%9B%9E502%E9%94%99%E8%AF%AF%E7%A0%81%E7%9A%84%E9%97%AE%E9%A2%98/</guid>
+      <description>详情 昨天由于项目需要，加入发送短信功能，首先测试了一下已存在的一个Python代码，原理比较简单，向一个接口发送一个http post请求，请求的数据为xml格式，同时请求会带一个header头，Key为Host信息。
+Python代码如下：
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18  # coding=utf-8 import requests import cgi def send(phone, msg): url = &amp;#39;http://xxx.</description>
     </item>
     
   </channel>
